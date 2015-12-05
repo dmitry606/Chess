@@ -53,15 +53,6 @@ namespace Chess.Models
 			return new GameGraph(Board).FilterOptions(piece, options);
 		}
 
-		//public Piece Update(MoveInfo move)
-		//{
-		//	var moved = ChessUtil.ComposePieceStringFromMove(move);
-		//	Pieces.Remove(move.PieceString);
-		//	Pieces.Add(moved);
-		//	Opponent.Pieces.Remove(moved);
-		//	return PieceFactory.Create(Color, moved);
-		//}
-
 		#region Equals
 		public bool Equals(Player other)
 		{
