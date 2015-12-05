@@ -1,0 +1,27 @@
+﻿{
+	"ddd": [
+		{
+			"$match": {
+				"state": { "$in": [ "CA", "NY" ] },
+				"pop": { "$gt": 25000 }
+			}
+		},
+		{
+			"$group": {
+				"_id": {
+					"state": "$state",
+					"city": "$city"
+				},
+				"avg1": { "$sum": "$pop" }
+			}
+		},
+		{
+			"$group": {
+				"_id": null,
+				"avg2": {"$avg": "$avg1"}
+			}
+		}
+	]
+
+
+}
