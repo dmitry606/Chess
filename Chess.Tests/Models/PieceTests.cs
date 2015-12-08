@@ -51,7 +51,7 @@ namespace Chess.Tests.Models
 			var moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(7, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Regular));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Regular));
 			Assert.AreEqual("a1", moves.Last().Destination);
 
 			//center
@@ -65,7 +65,7 @@ namespace Chess.Tests.Models
 			moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(10, moves.Count);
-			var capt = moves.Where(m => m.Event == EventType.Capture).ToList();
+			var capt = moves.Where(m => m.Event == MoveType.Capture).ToList();
 			Assert.AreEqual(2, capt.Count);
 			Assert.AreEqual(1, capt.Count(m => m.Destination == "b1"));
 			Assert.AreEqual(1, capt.Count(m => m.Destination == "g6"));
@@ -88,7 +88,7 @@ namespace Chess.Tests.Models
 			var moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(14, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Regular));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Regular));
 			var last = moves.Last().Destination;
 			Assert.IsTrue(last == "a1" || last == "h8");
 
@@ -103,7 +103,7 @@ namespace Chess.Tests.Models
 			moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(11, moves.Count);
-			var capt = moves.Where(m => m.Event == EventType.Capture).ToList();
+			var capt = moves.Where(m => m.Event == MoveType.Capture).ToList();
 			Assert.AreEqual(2, capt.Count);
 			Assert.AreEqual(1, capt.Count(m => m.Destination == "e2"));
 			Assert.AreEqual(1, capt.Count(m => m.Destination == "a4"));
@@ -126,7 +126,7 @@ namespace Chess.Tests.Models
 			var moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(21, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Regular));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Regular));
 			var last = moves.Last().Destination;
 			Assert.IsTrue(last == "a1" || last == "h8" || last == "a8");
 
@@ -145,7 +145,7 @@ namespace Chess.Tests.Models
 			moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(21, moves.Count);
-			var capt = moves.Where(m => m.Event == EventType.Capture).ToList();
+			var capt = moves.Where(m => m.Event == MoveType.Capture).ToList();
 			Assert.AreEqual(4, capt.Count);
 			Assert.AreEqual(1, capt.Count(m => m.Destination == "e2"));
 			Assert.AreEqual(1, capt.Count(m => m.Destination == "a4"));
@@ -173,7 +173,7 @@ namespace Chess.Tests.Models
 			var moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(7, moves.Count);
-			var capt = moves.Where(m => m.Event == EventType.Capture).ToList();
+			var capt = moves.Where(m => m.Event == MoveType.Capture).ToList();
 			Assert.AreEqual(1, capt.Count);
 			Assert.AreEqual("d4", capt.First().Destination);
 		}
@@ -183,35 +183,35 @@ namespace Chess.Tests.Models
 		{
 			var board = BoardMatrixFactory.GetEmptyBoard();
 			var moves = SpawnKing(board, "e8", Color.Black);
-			Assert.AreEqual(2, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(2, moves.Where(m => m.Event == MoveType.Castling).Count());
 
 			moves = SpawnKing(board, "e7", Color.Black);
-			Assert.AreEqual(0, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(0, moves.Where(m => m.Event == MoveType.Castling).Count());
 
 			moves = SpawnKing(board, "e1", Color.White);
-			Assert.AreEqual(2, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(2, moves.Where(m => m.Event == MoveType.Castling).Count());
 
 			moves = SpawnKing(board, "e2", Color.White);
-			Assert.AreEqual(0, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(0, moves.Where(m => m.Event == MoveType.Castling).Count());
 
 			board = BoardMatrixFactory.GetEmptyBoard();
 			board["g8"] = Color.Black;
 			moves = SpawnKing(board, "e8", Color.Black);
-			Assert.AreEqual(1, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(1, moves.Where(m => m.Event == MoveType.Castling).Count());
 			board["b8"] = Color.Black;
 			moves = SpawnKing(board, "e8", Color.Black);
-			Assert.AreEqual(0, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(0, moves.Where(m => m.Event == MoveType.Castling).Count());
 
 			board = BoardMatrixFactory.GetEmptyBoard();
 			board["g1"] = Color.White;
 			moves = SpawnKing(board, "e1", Color.White);
-			Assert.AreEqual(1, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(1, moves.Where(m => m.Event == MoveType.Castling).Count());
 			board["b1"] = Color.White;
 			moves = SpawnKing(board, "e1", Color.Black);
-			Assert.AreEqual(0, moves.Where(m => m.Event == EventType.Castling).Count());
+			Assert.AreEqual(0, moves.Where(m => m.Event == MoveType.Castling).Count());
 		}
 
-		private List<RawOption> SpawnKing(BoardMatrix board, string position, Color color)
+		private List<MoveOption> SpawnKing(BoardMatrix board, string position, Color color)
 		{
 			board[position] = color;
 			var piece = new King(color, 'K' + position);
@@ -240,7 +240,7 @@ namespace Chess.Tests.Models
 			var moves = piece.GetTechnicalMoves(board);
 
 			Assert.AreEqual(7, moves.Count);
-			var capt = moves.Where(m => m.Event == EventType.Capture).ToList();
+			var capt = moves.Where(m => m.Event == MoveType.Capture).ToList();
 			Assert.AreEqual(1, capt.Count);
 			Assert.AreEqual("c3", capt.First().Destination);
 		}
@@ -254,10 +254,10 @@ namespace Chess.Tests.Models
 
 			var moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Regular));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Regular));
 			Assert.IsTrue(moves.Any(m => m.Destination == "b6"));
 			Assert.IsTrue(moves.Any(m => m.Destination == "b5"));
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == null));
+			Assert.IsTrue(moves.All(m => m.Secondary == null));
 
 			board["b5"] = Color.Black;
 			moves = piece.GetTechnicalMoves(board);
@@ -271,7 +271,7 @@ namespace Chess.Tests.Models
 			board["c6"] = Color.White;
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(1, moves.Count);
-			Assert.AreEqual(EventType.Capture, moves.Single().Event);
+			Assert.AreEqual(MoveType.Capture, moves.Single().Event);
 
 			board["a6"] = Color.Black;
 			var moves2 = piece.GetTechnicalMoves(board);
@@ -280,8 +280,8 @@ namespace Chess.Tests.Models
 			board["a6"] = Color.White;
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Capture));
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == null));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Capture));
+			Assert.IsTrue(moves.All(m => m.Secondary == null));
 
 			board["e4"] = Color.Black;
 			piece = new Pawn(Color.Black, "pe4");
@@ -289,9 +289,9 @@ namespace Chess.Tests.Models
 
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
-			Assert.AreEqual("f3", moves.Single(m => m.Event == EventType.Capture).Destination);
-			Assert.AreEqual("e3", moves.Single(m => m.Event == EventType.Regular).Destination);
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == null));
+			Assert.AreEqual("f3", moves.Single(m => m.Event == MoveType.Capture).Destination);
+			Assert.AreEqual("e3", moves.Single(m => m.Event == MoveType.Regular).Destination);
+			Assert.IsTrue(moves.All(m => m.Secondary == null));
 
 			board["d1"] = Color.Black;
 			piece = new Pawn(Color.Black, "pd1");
@@ -308,10 +308,10 @@ namespace Chess.Tests.Models
 
 			var moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Regular));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Regular));
 			Assert.IsTrue(moves.Any(m => m.Destination == "b3"));
 			Assert.IsTrue(moves.Any(m => m.Destination == "b4"));
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == null));
+			Assert.IsTrue(moves.All(m => m.Secondary == null));
 
 			board["b4"] = Color.White;
 			moves = piece.GetTechnicalMoves(board);
@@ -325,7 +325,7 @@ namespace Chess.Tests.Models
 			board["c3"] = Color.Black;
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(1, moves.Count);
-			Assert.AreEqual(EventType.Capture, moves.Single().Event);
+			Assert.AreEqual(MoveType.Capture, moves.Single().Event);
 
 			board["a3"] = Color.White;
 			var moves2 = piece.GetTechnicalMoves(board);
@@ -334,8 +334,8 @@ namespace Chess.Tests.Models
 			board["a3"] = Color.Black;
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Capture));
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == null));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Capture));
+			Assert.IsTrue(moves.All(m => m.Secondary == null));
 
 			board["e4"] = Color.White;
 			piece = new Pawn(Color.White, "pe4");
@@ -343,9 +343,9 @@ namespace Chess.Tests.Models
 
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
-			Assert.AreEqual("f5", moves.Single(m => m.Event == EventType.Capture).Destination);
-			Assert.AreEqual("e5", moves.Single(m => m.Event == EventType.Regular).Destination);
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == null));
+			Assert.AreEqual("f5", moves.Single(m => m.Event == MoveType.Capture).Destination);
+			Assert.AreEqual("e5", moves.Single(m => m.Event == MoveType.Regular).Destination);
+			Assert.IsTrue(moves.All(m => m.Secondary == null));
 
 			board["d8"] = Color.White;
 			piece = new Pawn(Color.White, "pd8");
@@ -366,13 +366,13 @@ namespace Chess.Tests.Models
 			Assert.AreEqual(2, moves.Count);
 			var m = moves.FirstOrDefault(_ => _.Destination == "g1");
 			Assert.IsNotNull(m);
-			Assert.AreEqual(EventType.Regular, m.Event);
-			Assert.AreEqual(EventType.Promotion, m.SecondaryEvent);
+			Assert.AreEqual(MoveType.Regular, m.Event);
+			Assert.AreEqual(SecondaryMoveType.Promotion, m.Secondary);
 
 			m = moves.FirstOrDefault(_ => _.Destination == "h1");
 			Assert.IsNotNull(m);
-			Assert.AreEqual(EventType.Capture, m.Event);
-			Assert.AreEqual(EventType.Promotion, m.SecondaryEvent);
+			Assert.AreEqual(MoveType.Capture, m.Event);
+			Assert.AreEqual(SecondaryMoveType.Promotion, m.Secondary);
 		}
 
 		[TestMethod]
@@ -388,13 +388,13 @@ namespace Chess.Tests.Models
 			Assert.AreEqual(2, moves.Count);
 			var m = moves.FirstOrDefault(_ => _.Destination == "g8");
 			Assert.IsNotNull(m);
-			Assert.AreEqual(EventType.Regular, m.Event);
-			Assert.AreEqual(EventType.Promotion, m.SecondaryEvent);
+			Assert.AreEqual(MoveType.Regular, m.Event);
+			Assert.AreEqual(SecondaryMoveType.Promotion, m.Secondary);
 
 			m = moves.FirstOrDefault(_ => _.Destination == "h8");
 			Assert.IsNotNull(m);
-			Assert.AreEqual(EventType.Capture, m.Event);
-			Assert.AreEqual(EventType.Promotion, m.SecondaryEvent);
+			Assert.AreEqual(MoveType.Capture, m.Event);
+			Assert.AreEqual(SecondaryMoveType.Promotion, m.Secondary);
 		}
 
 
@@ -406,23 +406,27 @@ namespace Chess.Tests.Models
 			var piece = new Pawn(Color.Black, "pf4");
 
 			var moves = piece.GetTechnicalMoves(board)
-				.Where(m => m.SecondaryEvent.HasValue)
+				.Where(m => m.Secondary.HasValue)
 				.ToList();
 			Assert.AreEqual(2, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Capture));
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == EventType.EnPassant));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Capture));
+			Assert.IsTrue(moves.All(m => m.Secondary == SecondaryMoveType.EnPassant));
+			Assert.IsTrue(moves.All(m => m.SpecialCapturePosition != null));
 
 			board["e3"] = Color.White;
 			moves = piece.GetTechnicalMoves(board)
-				.Where(m => m.SecondaryEvent.HasValue)
+				.Where(m => m.Secondary.HasValue)
 				.ToList();
 			Assert.AreEqual(1, moves.Count);
+			Assert.AreEqual("g4", moves.First().SpecialCapturePosition);
 
+			board["e3"] = null;
 			board["g3"] = Color.White;
 			moves = piece.GetTechnicalMoves(board)
-				.Where(m => m.SecondaryEvent.HasValue)
+				.Where(m => m.Secondary.HasValue)
 				.ToList();
-			Assert.AreEqual(0, moves.Count);
+			Assert.AreEqual(1, moves.Count);
+			Assert.AreEqual("e4", moves.First().SpecialCapturePosition);
 		}
 
 		[TestMethod]
@@ -433,23 +437,26 @@ namespace Chess.Tests.Models
 			var piece = new Pawn(Color.White, "pc5");
 
 			var moves = piece.GetTechnicalMoves(board)
-				.Where(m => m.SecondaryEvent.HasValue)
+				.Where(m => m.Secondary.HasValue)
 				.ToList();
 			Assert.AreEqual(2, moves.Count);
-			Assert.IsTrue(moves.All(m => m.Event == EventType.Capture));
-			Assert.IsTrue(moves.All(m => m.SecondaryEvent == EventType.EnPassant));
+			Assert.IsTrue(moves.All(m => m.Event == MoveType.Capture));
+			Assert.IsTrue(moves.All(m => m.Secondary == SecondaryMoveType.EnPassant));
+			Assert.IsTrue(moves.All(m => m.SpecialCapturePosition != null));
 
 			board["b6"] = Color.White;
 			moves = piece.GetTechnicalMoves(board)
-				.Where(m => m.SecondaryEvent.HasValue)
+				.Where(m => m.Secondary.HasValue)
 				.ToList();
 			Assert.AreEqual(1, moves.Count);
+			Assert.AreEqual("d5", moves.First().SpecialCapturePosition);
 
-			board["d6"] = Color.White;
+			board["b6"] = null;
+			board["d6"] = Color.Black;
 			moves = piece.GetTechnicalMoves(board)
-				.Where(m => m.SecondaryEvent.HasValue)
+				.Where(m => m.Secondary.HasValue)
 				.ToList();
-			Assert.AreEqual(0, moves.Count);
+			Assert.AreEqual("b5", moves.First().SpecialCapturePosition);
 		}
 
 
@@ -459,7 +466,7 @@ namespace Chess.Tests.Models
 
 			public TestPiece(Color color, string pieceString) : base(color, pieceString) { }
 
-			public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+			public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 			{
 				throw new NotImplementedException();
 			}

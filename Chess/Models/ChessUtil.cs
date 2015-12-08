@@ -11,7 +11,7 @@ namespace Chess.Models
 		public static string ExtractPosition(string pieceString) => pieceString.Substring(1, 2);
 
 		public static string ComposePieceString(char charType, string position) => charType + position;
-		public static string ComposePieceStringFromMove(MoveInfo info) => info.PieceString[0] + info.Destination; 
+		//public static string ComposePieceStringFromMove(MoveHistoryEntry info) => info.PieceString[0] + info.Destination;
 
 		public static Color Invert(this Color c)
 		{

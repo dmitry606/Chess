@@ -27,41 +27,19 @@ namespace Chess.Models.Tests
 			var board = new Board();
 			Assert.IsTrue(board.IsOpen);
 
-			board.History.Add(new MoveInfo {
-				Destination = "e4",
-				Events = { EventType.Capture, EventType.Check },
-				PieceString = "Qd2" });
+			board.History.Add(new HistoryEntry("Qd2", "e4", MoveType.Capture));
 			Assert.IsTrue(board.IsOpen);
 
-			board.History.Add(new MoveInfo
-			{
-				Destination = "d7",
-				Events = { EventType.Capture },
-				PieceString = "Rg1"
-			});
+			board.History.Add(new HistoryEntry("Rg1", "d1", MoveType.Capture) { ResultingEvent = GameEvent.Check });
 			Assert.IsTrue(board.IsOpen);
 
-			board.History.Add(new MoveInfo
-			{
-				Destination = "b5",
-				Events = { EventType.Capture, EventType.Checkmate },
-				PieceString = "Ng2"
-			});
+			board.History.Add(new HistoryEntry("Rg1", "d1", MoveType.Capture) { ResultingEvent = GameEvent.Checkmate });
 			Assert.IsFalse(board.IsOpen);
 
 			board = new Board();
-			board.History.Add(new MoveInfo
-			{
-				Destination = "e4",
-				Events = { EventType.Capture, EventType.Check },
-				PieceString = "Qd2"
-			});
-			board.History.Add(new MoveInfo
-			{
-				Destination = "d7",
-				Events = { EventType.Draw },
-				PieceString = "Rg1"
-			});
+			board.History.Add(new HistoryEntry("Rg1", "d1", MoveType.Capture) { ResultingEvent = GameEvent.Check });
+			board.History.Add(new HistoryEntry("Rg1", "d1", MoveType.Capture) { ResultingEvent = GameEvent.Draw });
+
 			Assert.IsFalse(board.IsOpen);
 		}
 
@@ -79,6 +57,12 @@ namespace Chess.Models.Tests
 
 		[TestMethod]
 		public void PeekHistory_test()
+		{
+			Assert.Fail();
+		}
+
+		[TestMethod]
+		public void GetLastEntry_test()
 		{
 			Assert.Fail();
 		}
@@ -120,12 +104,12 @@ namespace Chess.Models.Tests
 			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
 
 			board2 = BoardFactory.ConstructBoard();
-			board2.History.Add(new MoveInfo { PieceString = "Pa1", Destination = "a2", Events = { EventType.Regular } });
+			board2.History.Add(new HistoryEntry("Rg1", "d1", MoveType.Capture) { ResultingEvent = GameEvent.Checkmate });
 			Assert.AreNotEqual(board1, board2);
 			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
 
 			board2 = BoardFactory.ConstructBoard();
-			board2.White.Pieces.Add("Qe1");
+			board2.White.PieceStrings.Add("Qe1");
 			Assert.AreNotEqual(board1, board2);
 			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
 

@@ -5,58 +5,68 @@ using System.Web;
 
 namespace Chess.Models
 {
-	public class MoveInfo
+	public class HistoryEntry
 	{
 		public string PieceString { get; set; }
-		public string Destination { get; set; }
-		public List<EventType> Events { get; set; }
-	}
+		public MoveOption Move { get; set; }
+		public GameEvent? ResultingEvent { get; set; }
 
-	public enum EventType
+		public HistoryEntry()
+		{
+		}
+
+		public HistoryEntry(string pieceString, string dest, MoveType moveType, SecondaryMoveType? sec = null)
+		{
+			if (pieceString == null || pieceString.Length != 3)
+				throw new ArgumentException(pieceString, nameof(pieceString));
+
+			PieceString = pieceString;
+			Move = new MoveOption(moveType, dest);
+			Move.Secondary = sec;
+		}
+    }
+
+	public enum MoveType
 	{
 		Regular, //pos || not in check
 		Capture, //pos, piece 
-		Castling, //pos (or long/short)
-
-		EnPassant, //ep, pos
-		Promotion, //=Q/N/R/B 
-
-		Check, //+
-		Checkmate, //#
-        Draw, //%
+		Castling, //pos
 	}
 
-	public class RawOption : IEquatable<RawOption>
+	public enum SecondaryMoveType
 	{
-		public EventType Event { get; }
-		public string Destination { get; }
-		public EventType? SecondaryEvent { get; } //for the pawn's promotion and en passant
+		EnPassant, //ep
+		Promotion, //=Q/N/R/B 
+	}
 
-		public RawOption(EventType eventType, string intendedPosition)
+	public enum GameEvent
+	{
+		Check, //+
+		Checkmate, //#
+		Draw, //%
+	}
+
+	public class MoveOption : IEquatable<MoveOption>
+	{
+		public MoveType Event { get; set; }
+		public string Destination { get; set; }
+
+		public SecondaryMoveType? Secondary { get; set;  } 
+		public string SpecialCapturePosition { get; set; }
+
+		public MoveOption(MoveType moveType, string dest)
 		{
-			Event = eventType;
-			Destination = intendedPosition;
+			if (dest == null || dest.Length != 2)
+				throw new ArgumentException(dest, nameof(dest));
+
+			Event = moveType;
+			Destination = dest;
 		}
 
-		public MoveInfo ToMoveInfo(Piece piece)
-		{
-			var result = new MoveInfo
-			{
-				Destination = Destination,
-				PieceString = piece.PieceString,
-				Events = new List<EventType> { Event },
-			};
-
-			if (SecondaryEvent.HasValue)
-				result.Events.Add(SecondaryEvent.Value);
-
-			return result;
-		}
-
-		public override string ToString() => Enum.GetName(typeof(EventType), Event) + ' ' + Destination;
+		public override string ToString() => Enum.GetName(typeof(MoveType), Event) + ' ' + Destination;
 
 		#region Equals
-		public bool Equals(RawOption other)
+		public bool Equals(MoveOption other)
 		{
 			if (other == null)
 				return false;
@@ -65,7 +75,7 @@ namespace Chess.Models
 
 		public override bool Equals(object obj)
 		{
-			return Equals(obj as RawOption);
+			return Equals(obj as MoveOption);
 		}
 
 		public override int GetHashCode()
@@ -81,18 +91,6 @@ namespace Chess.Models
 
 	public class GameGraph
 	{
-		private readonly Dictionary<EventType, List<EventType>> TheGraph = new Dictionary<EventType, List<EventType>>
-		{
-			[EventType.Regular] = { EventType.Promotion, EventType.Check, EventType.Draw },
-			[EventType.Capture] = { EventType.Promotion, EventType.Check, EventType.Draw },
-			[EventType.Castling] = { EventType.Check, EventType.Draw },
-			[EventType.EnPassant] = { EventType.Check, EventType.Draw },
-			[EventType.Promotion] = { EventType.Check, EventType.Draw },
-			[EventType.Check] = { EventType.Checkmate },
-			[EventType.Draw] = { },
-			[EventType.Checkmate] = { }
-		};
-
 		public Board SourceBoard { get; }
 
 		public GameGraph(Board board)
@@ -101,110 +99,113 @@ namespace Chess.Models
 			SourceBoard = board;
 		}
 
-		public List<MoveInfo> FilterOptions(Piece piece, IEnumerable<RawOption> options)
+		public List<MoveOption> FilterOptions(Piece piece, IEnumerable<MoveOption> options)
 		{
-			return options
-				.Where(opt => Branch(piece, opt, false))
-				.Select(opt => opt.ToMoveInfo(piece))
-				.ToList();
-
-			//foreach (var move in options)
-			//{
-			//	//var clone = SourceBoard.Clone();
-			//	//var player = clone[piece.Color];
-
-			//	//var movedPiece = player.Update(move);
-
-			//	//if(!IsInCheck(player))
-			//	//{
-			//	//	result.Add(move);
-			//	//}
-			//}
+			return options.Where(opt => IsAllowed(piece, opt)).ToList();
 		}
 
-		private bool Branch(Piece piece, RawOption option, bool apply)
+		public GameEvent? Execute(Piece piece, MoveOption move, char? promotionPiece = null)
 		{
-			if(option.SecondaryEvent == EventType.EnPassant)
+			if (piece == null)
+				throw new ArgumentNullException(nameof(piece));
+			if (move == null)
+				throw new ArgumentNullException(nameof(move));
+
+
+			if ((move.Secondary != SecondaryMoveType.Promotion && promotionPiece != null) ||
+				(move.Secondary == SecondaryMoveType.Promotion && promotionPiece == null))
 			{
-				//1. check history
-				//2. simulate
-				//3. not in check
-				//4. apply
-				//5. evalulate
+				throw new ArgumentException("Invalid promotion");
 			}
 
-			if(option.Event == EventType.Castling)
+			if (!IsAllowed(piece, move))
+				throw new ArgumentException($"Move to {move.Destination} is not legal");
+
+			ApplyMove(SourceBoard, piece, move, promotionPiece);
+			return EvaluateGameState();
+        }
+
+		private bool IsAllowed(Piece piece, MoveOption move)
+		{
+			if(move.Event == MoveType.Castling)
 			{
-				//1. check history
-				//2. check the route is not under attack
-				//3. apply
-				//4. evalulate
+				var king = piece as King;
+				if (null == king)
+					throw new ArgumentException($"{move.Event} is not allowed for {piece}");
+
+				//king has not moved
+				if (SourceBoard.GetLastEntryForCell(king.Position) != null) 
+					return false;
+
+				//rook has not moved
+				if (SourceBoard.GetLastEntryForCell(king.GetRookCastlingFromAndToPos(move).Item1) != null)
+					return false;
+
+				//king's route is not under attack (incl. its current pos)
+				if (king.GetKingCastlingRoute(move).Any(m => IsUnderAttack(SourceBoard, m, piece.Color.Invert())))
+					return false;
 			}
 
-			if (option.Event == EventType.Regular || option.Event == EventType.Capture)
+			if (move.Event == MoveType.Regular || move.Event == MoveType.Capture)
 			{
-				//1. simulate
-				//2. not in check
-				//3. apply
-				//4. evalulate
+				if (move.Secondary == SecondaryMoveType.EnPassant)
+				{
+					if (!(piece is Pawn))
+						throw new ArgumentException($"{move.Event} is not allowed for {piece}");
+
+					//ensure that the opponent's last move was of a pawn to the enpassant position
+					var expected = ChessUtil.ComposePieceString(Piece.Pawn, move.SpecialCapturePosition);
+					if (SourceBoard.PeekHistory().PieceString != expected)
+						return false;
+				}
+
+				var clone = SourceBoard.Clone();
+				ApplyMove(clone, piece, move);
+				if (IsInCheck(clone, piece.Color))
+					return false;
 			}
 
+			return true;
+		}
+
+		private GameEvent? EvaluateGameState()
+		{
 			throw new NotImplementedException();
 		}
 
-		private static void ApplyEvent(Board board, Piece piece, RawOption option, char? promotionPiece = null)
+		private static void ApplyMove(Board board, Piece piece, MoveOption move, char? promotionPiece = null)
 		{
-			//if((option.SecondaryEvent != EventType.Promotion && promotionPiece != null) || 
-			//	(option.SecondaryEvent == EventType.Promotion && promotionPiece == null))
-			//{
-			//	throw new ArgumentException("Invalid promotion");
-			//}
-
-			switch(option.Event)
+			switch(move.Event)
 			{
-                case EventType.Regular:
-				case EventType.Capture:
-					board[piece].Move(option.Destination, promotionPiece);
+                case MoveType.Regular:
+				case MoveType.Capture:
+					board[piece].Move(move.Destination, promotionPiece);
 
-					if(option.SecondaryEvent == EventType.EnPassant)
+					if(null != move.SpecialCapturePosition)
 					{
-						var captured = option.Destination[0].ToString() + piece.Position[1];
-						board[captured].Remove();
+						board[move.SpecialCapturePosition].Remove();
 					}
 					break;
 
-				case EventType.Castling:
-					board[piece].Move(option.Destination); //king
-
-					//rook
-					var row = piece.Color == Color.White ? "1" : "8";
-					if(option.Destination[0] == 'c') //long
-					{
-						board["a" + row].Move("d" + row);
-                    }
-					else //short
-					{
-						board["h" + row].Move("f" + row);
-					}
-
+				case MoveType.Castling:
+					board[piece].Move(move.Destination); //king
+					var rook = ((King)piece).GetRookCastlingFromAndToPos(move);
+					board[rook.Item1].Move(rook.Item2);
 					break;
             }
 		}
 
-		public void Execute(MoveInfo move, char? promotionTarget = null)
+		private static bool IsInCheck(Board board, Color color)
 		{
-			//var king = Player
-			//var king = Player.Get<King>();
+			return IsUnderAttack(board, new King(board[color]).Position, color.Invert());
 		}
 
-		private static bool NotInCheck(Player player)
+		private static bool IsUnderAttack(Board board, string position, Color fromColor)
 		{
-			throw new NotImplementedException();
-		}
-
-		private static bool IsUnderAttack(string position, Color player)
-		{
-			throw new NotImplementedException();
+			var matrix = board.GetMatrix();
+			return board[fromColor].Pieces
+				.SelectMany(p => p.GetTechnicalMoves(matrix))
+				.Any(m => m.Destination == position || m.SpecialCapturePosition == position);
 		}
 	}
 }

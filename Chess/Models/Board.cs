@@ -24,7 +24,7 @@ namespace Chess.Models
 		public DateTime CreatedAt { get; set; }
 		public DateTime LastModifiedAt { get; set; }
 
-		public List<MoveInfo> History { get; set; }
+		public List<HistoryEntry> History { get; set; }
 
 		public Player White
 		{
@@ -50,7 +50,8 @@ namespace Chess.Models
 		{
 			get
 			{
-				return PeekHistory().Events.All(e => e != EventType.Draw && e != EventType.Checkmate);
+				var h = PeekHistory();
+				return h == null || h.ResultingEvent == null || h.ResultingEvent == GameEvent.Check;
 			}
 		}
 
@@ -64,20 +65,13 @@ namespace Chess.Models
 			}
 		}
 
-		public CellHandle this[Piece piece]
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
-
+		public CellHandle this[Piece piece] => this[piece.Position];
 
 		public Board()
 		{
 			White = new Player();
 			Black = new Player();
-			History = new List<MoveInfo>();
+			History = new List<HistoryEntry>();
 		}
 
 		public BoardMatrix GetMatrix()
@@ -85,17 +79,17 @@ namespace Chess.Models
 			throw new NotImplementedException();
 		}
 
-		public void PushHistory(MoveInfo move)
+		public void PushHistory(HistoryEntry move)
 		{
 			History.Add(move);
 		}
 
-		public MoveInfo PeekHistory()
+		public HistoryEntry PeekHistory()
 		{
 			return History.LastOrDefault();
 		}
 
-		public bool IsInCheck(Color player)
+		public HistoryEntry GetLastEntryForCell(string position)
 		{
 			throw new NotImplementedException();
 		}

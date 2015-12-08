@@ -20,7 +20,7 @@ namespace Chess.Tests
 				White = new Player
 				{
 					Name = "Vasya",
-					Pieces = new List<string>
+					PieceStrings = new List<string>
 					{
 						"Qe1", "Nd5", "pe4", "pb2"
 					}
@@ -29,17 +29,17 @@ namespace Chess.Tests
 				Black = new Player
 				{
 					Name = "Petya",
-					Pieces = new List<string>
+					PieceStrings = new List<string>
 					{
 						"Ka2", "Rf4", "pd5"
 					}
 				},
 
-				History = new List<MoveInfo>
+				History = new List<HistoryEntry>
 				{
-					new MoveInfo { PieceString = "Qa2", Destination = "e4", Events = { EventType.Regular } },
-					new MoveInfo { PieceString = "Rg1", Destination = "b7", Events = { EventType.Capture, EventType.Check } },
-					new MoveInfo { PieceString = "Pb2", Destination = "g4", Events = { EventType.Regular, EventType.Promotion } },
+					new HistoryEntry("Qa2", "e4", MoveType.Regular),
+					new HistoryEntry ("Rg1", "b7", MoveType.Capture) { ResultingEvent = GameEvent.Check },
+					new HistoryEntry ("Pb2", "g4", MoveType.Regular, SecondaryMoveType.Promotion),
 				}
 			};
 		}
@@ -54,7 +54,7 @@ namespace Chess.Tests
 				White = new Player
 				{
 					Name = "Jenya",
-					Pieces = new List<string>
+					PieceStrings = new List<string>
 					{
 						"pa1", "pa2", "Ke6"
 					}
@@ -63,17 +63,17 @@ namespace Chess.Tests
 				Black = new Player
 				{
 					Name = "Vitya",
-					Pieces = new List<string>
+					PieceStrings = new List<string>
 					{
 						"Kd7", "Ba4"
 					}
 				},
 
-				History = new List<MoveInfo>
+				History = new List<HistoryEntry>
 				{
-					new MoveInfo { PieceString = "Kf2", Destination = "e2", Events = { EventType.Castling } },
-					new MoveInfo { PieceString = "Bc5", Destination = "c1", Events = { EventType.Regular } },
-					new MoveInfo { PieceString = "Ra1", Destination = "a5", Events = { EventType.Regular } },
+					new HistoryEntry ("Kf2", "e2", MoveType.Castling),
+					new HistoryEntry ("Bc5", "c1", MoveType.Regular),
+					new HistoryEntry ("Ra1", "a5", MoveType.Regular),
 				}
 			};
 		}

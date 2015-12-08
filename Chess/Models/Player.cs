@@ -9,48 +9,51 @@ namespace Chess.Models
 	public class Player
 	{
 		public string Name { get; set; }
-		public List<string> Pieces { get; set; } = new List<string>();
+		public List<string> PieceStrings { get; set; } = new List<string>();
 		public Board Board { get; set; }
 
 		public Color Color => Board.White == this ? Color.White : Color.Black;
 		public Player Opponent => Board.White == this ? Board.Black : Board.White;
+		public List<Piece> Pieces => PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
 
-		public Piece this[string position]
-		{
-			get
-			{
-				var index = Pieces.FindIndex(s => s.EndsWith(position));
-				if (-1 == index)
-					throw new ArgumentException($"No piece at '{position}'", nameof(position));
-                return PieceFactory.Create(this, index);
-			}
-		}
+		public List<MoveOption> GetLegalMoves(string position) => GetLegalMoves(FindPiece(position));
 
-		public List<MoveInfo> GetLegalMoves(string position) => GetLegalMoves(this[position]);
-
-		public MoveInfo MakeMove(string from, string to, char? promotionTarget = null)
+		public void MakeMove(string from, string to, char? promotionTarget = null)
 		{
 			if (string.IsNullOrEmpty(from))
 				throw new ArgumentException(nameof(from));
 			if (string.IsNullOrEmpty(to))
 				throw new ArgumentException(nameof(to));
 
-			var piece = this[from];
-			var moves = GetLegalMoves(piece);
-			var move = moves.First(m => m.Destination == to);
-//			piece = Update(move);
-			var graph = new GameGraph(Board);
-			graph.Execute(move, promotionTarget);
-			Board.PushHistory(move);
-			return move;
+			var piece = FindPiece(from);
+			var move = piece
+				.GetTechnicalMoves(Board.GetMatrix())
+				.FirstOrDefault(m => m.Destination == to);
+			if (null == move)
+				throw new ArgumentException($"Move to {to} is not possible", nameof(to));
+
+			var gameState = new GameGraph(Board).Execute(piece, move, promotionTarget);
+
+			Board.PushHistory(new HistoryEntry
+			{
+				Move = move,
+				PieceString = piece.PieceString,
+				ResultingEvent = gameState
+			});
 		}
 
-		private List<MoveInfo> GetLegalMoves(Piece piece)
+		private List<MoveOption> GetLegalMoves(Piece piece)
 		{
 			var options = piece.GetTechnicalMoves(Board.GetMatrix());
-			var graph = new GameGraph(Board);
-
 			return new GameGraph(Board).FilterOptions(piece, options);
+		}
+
+		private Piece FindPiece(string position)
+		{
+			var index = PieceStrings.FindIndex(s => s.EndsWith(position));
+			if (-1 == index)
+				throw new ArgumentException($"No piece at '{position}'", nameof(position));
+			return PieceFactory.Create(this, index);
 		}
 
 		#region Equals
@@ -61,14 +64,14 @@ namespace Chess.Models
 			if (ReferenceEquals(this, other))
 				return true;
 
-			return Equals(Name, other.Name) && Pieces.SequenceEqual(other.Pieces);
+			return Equals(Name, other.Name) && PieceStrings.SequenceEqual(other.PieceStrings);
 		}
 		public override bool Equals(object obj) => Equals(obj as Player);
 
 		public override int GetHashCode()
 		{
 			int hash = 19;
-			hash = hash * 31 + Pieces.SequenceGetHashCode();
+			hash = hash * 31 + PieceStrings.SequenceGetHashCode();
 			hash = hash * 31 + Name?.GetHashCode() ?? 0;
 			return hash;
 		}

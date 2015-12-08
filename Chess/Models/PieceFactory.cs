@@ -7,7 +7,7 @@ namespace Chess.Models
 {
 	public static class PieceFactory
 	{
-		public static Piece Create(Player player, int pieceIndex) => Create(player.Color, player.Pieces[pieceIndex]);
+		public static Piece Create(Player player, int pieceIndex) => Create(player.Color, player.PieceStrings[pieceIndex]);
 
 		public static Piece Create(Color color, string pieceString)
 		{

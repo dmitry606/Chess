@@ -105,7 +105,7 @@ namespace Chess.Repositories.Concrete.Tests
 			rep.SaveBoardAsync(original).Wait();
 			var retrieved = rep.GetBoardAsync(original.Id).GetAwaiter().GetResult();
 
-			var addedEntry = new MoveInfo { PieceString = "Ka1", Destination = "b1", Events = { EventType.Regular } };
+			var addedEntry = new HistoryEntry("Ka1", "b1", MoveType.Regular);
             retrieved.History.Add(addedEntry);
             rep.SaveBoardAsync(retrieved).Wait();
 

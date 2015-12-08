@@ -20,7 +20,7 @@ namespace Chess.Models
 		public Color Color { get; }
 		public string PieceString => ChessUtil.ComposePieceString(CharType, Position);
 
-		public abstract List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix);
+		public abstract List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix);
 
 		protected Piece(Color color, string pieceString)
 		{
@@ -36,7 +36,7 @@ namespace Chess.Models
 			Color = color;
 		}
 
-		protected void GoLongDistance(BoardMatrix boardMatrix, Func<int, Tuple<int, int>> iter, List<RawOption> result)
+		protected void GoLongDistance(BoardMatrix boardMatrix, Func<int, Tuple<int, int>> iter, List<MoveOption> result)
 		{
 			for (int i = 1; i < 8; i++)
 			{
@@ -46,16 +46,16 @@ namespace Chess.Models
 			}
 		}
 
-		protected bool AddIfValid(BoardMatrix boardMatrix, Tuple<int, int> coords, List<RawOption> result)
+		protected bool AddIfValid(BoardMatrix boardMatrix, Tuple<int, int> coords, List<MoveOption> result)
 		{
 			if (!BoardMatrix.IsValidCoords(coords) || boardMatrix[coords] == Color)
 				return false;
 
 			var position = BoardMatrix.ConvertCoords(coords);
-			var ev = boardMatrix[coords].HasValue ? EventType.Capture : EventType.Regular;
-            result.Add(new RawOption(ev, position));
+			var ev = boardMatrix[coords].HasValue ? MoveType.Capture : MoveType.Regular;
+            result.Add(new MoveOption(ev, position));
 
-			return ev == EventType.Regular;
+			return ev == MoveType.Regular;
 		}
 
 		protected static Tuple<int, int> Add(Tuple<int, int> t, int first, int second)
@@ -73,12 +73,12 @@ namespace Chess.Models
 
 		public Bishop(Color color, string pieceString) : base(color, pieceString) { }
 
-		public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
 			var start = BoardMatrix.ConvertToTupleCoords(Position);
 			Debug.Assert(boardMatrix[start] == Color);
 
-			var result = new List<RawOption>();
+			var result = new List<MoveOption>();
 
 			GoLongDistance(boardMatrix, i => Add(start, i, i), result);
 			GoLongDistance(boardMatrix, i => Add(start, -i, -i), result);
@@ -95,12 +95,12 @@ namespace Chess.Models
 
 		public Rook(Color color, string pieceString) : base(color, pieceString) { }
 
-		public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
 			var start = BoardMatrix.ConvertToTupleCoords(Position);
 			Debug.Assert(boardMatrix[start] == Color);
 
-			var result = new List<RawOption>();
+			var result = new List<MoveOption>();
 
 			GoLongDistance(boardMatrix, i => Add(start, i, 0), result);
 			GoLongDistance(boardMatrix, i => Add(start, 0, i), result);
@@ -117,12 +117,12 @@ namespace Chess.Models
 
 		public Queen(Color color, string pieceString) : base(color, pieceString) { }
 
-		public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
 			var start = BoardMatrix.ConvertToTupleCoords(Position);
 			Debug.Assert(boardMatrix[start] == Color);
 
-			var result = new List<RawOption>();
+			var result = new List<MoveOption>();
 
 			GoLongDistance(boardMatrix, i => Add(start, i, 0), result);
 			GoLongDistance(boardMatrix, i => Add(start, 0, i), result);
@@ -145,15 +145,15 @@ namespace Chess.Models
 		public King(Color color, string pieceString) : base(color, pieceString) { }
 
 		public King(Player player) 
-			:base(player.Color, player.Pieces.SingleOrDefault(s => s[0] == King))
+			:base(player.Color, player.PieceStrings.SingleOrDefault(s => s[0] == King))
 		{
 		}
 
-		public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
 			var start = BoardMatrix.ConvertToTupleCoords(Position);
 			Debug.Assert(boardMatrix[start] == Color);
-			var result = new List<RawOption>();
+			var result = new List<MoveOption>();
 
 			Action<int, int> add = (iInc, jInc) => AddIfValid(boardMatrix, Add(start, iInc, jInc), result);
 
@@ -167,32 +167,39 @@ namespace Chess.Models
 			add(1, -1);
 			add(-1, 1);
 
-			if(Color == Color.Black && Position == "e8")
+			var row = Color == Color.White ? "1" : "8";
+			if (Position == "e" + row)
 			{
-				if(boardMatrix.AreEmpty("f8", "g8"))
+				if (boardMatrix.AreEmpty("f" + row, "g" + row))
 				{
-					result.Add(new RawOption(EventType.Castling, "g8"));
+					result.Add(new MoveOption(MoveType.Castling, "g" + row));
 				}
 
-				if (boardMatrix.AreEmpty("b8", "c8", "d8"))
+				if (boardMatrix.AreEmpty("b" + row, "c" + row, "d" + row))
 				{
-					result.Add(new RawOption(EventType.Castling, "c8"));
+					result.Add(new MoveOption(MoveType.Castling, "c" + row));
 				}
             }
-			else if (Color == Color.White && Position == "e1")
-			{
-				if (boardMatrix.AreEmpty("f1", "g1"))
-				{
-					result.Add(new RawOption(EventType.Castling, "g1"));
-				}
-
-				if (boardMatrix.AreEmpty("b1", "c1", "d1"))
-				{
-					result.Add(new RawOption(EventType.Castling, "c1"));
-				}
-			}
 
 			return result;
+		}
+
+		public Tuple<string, string> GetRookCastlingFromAndToPos(MoveOption option)
+		{
+			var row = Color == Color.White ? "1" : "8";
+			return option.Destination[0] == 'c' ?
+				new Tuple<string, string>("a" + row, "d" + row) :
+				new Tuple<string, string>("h" + row, "f" + row);
+		}
+
+		public List<string> GetKingCastlingRoute(MoveOption move)
+		{
+			var chars = move.Destination[0] == 'c' ?
+				new List<string> { "e", "d", "c" } :
+				new List<string> { "e", "f", "g" };
+
+			var row = Color == Color.White ? "1" : "8";
+			return chars.Select(c => c + row).ToList();
 		}
 	}
 
@@ -202,12 +209,12 @@ namespace Chess.Models
 
 		public Knight(Color color, string pieceString) : base(color, pieceString) { }
 
-		public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
 			var start = BoardMatrix.ConvertToTupleCoords(Position);
 			Debug.Assert(boardMatrix[start] == Color);
 
-			var result = new List<RawOption>();
+			var result = new List<MoveOption>();
 
 			AddIfValid(boardMatrix, Add(start, 2, 1), result);
 			AddIfValid(boardMatrix, Add(start, 2, -1), result);
@@ -229,36 +236,42 @@ namespace Chess.Models
 
 		public Pawn(Color color, string pieceString) : base(color, pieceString) { }
 
-		public override List<RawOption> GetTechnicalMoves(BoardMatrix boardMatrix)
+		//public override string GetCapturePosition(MoveOption move)
+		//{
+		//	return move.Secondary == SecondaryMoveType.EnPassant ?
+		//		move.Destination[0].ToString() + Position[1] : move.Destination;
+  //      }
+
+		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
 			var start = BoardMatrix.ConvertToTupleCoords(Position);
 			Debug.Assert(boardMatrix[start] == Color);
 			var dir = Color == Color.Black ? +1 : -1;
 
-			var result = new List<RawOption>();
+			var result = new List<MoveOption>();
 
 			if ((Color == Color.Black)? (start.Item1 <= 6) : (start.Item1 >= 1))
 			{
 				var nextRegular = Add(start, dir * 1, 0);
 				if (null == boardMatrix[nextRegular])
 				{
-					result.Add(new RawOption(
-						EventType.Regular, BoardMatrix.ConvertCoords(nextRegular)));
+					result.Add(new MoveOption(
+						MoveType.Regular, BoardMatrix.ConvertCoords(nextRegular)));
 				}
 
 				var capture = Add(start, dir * 1, 1);
 				var opponentColor = Color == Color.White ? Color.Black : Color.White;
                 if (boardMatrix[capture] == opponentColor)
 				{
-					result.Add(new RawOption(
-						EventType.Capture, BoardMatrix.ConvertCoords(capture)));
+					result.Add(new MoveOption(
+						MoveType.Capture, BoardMatrix.ConvertCoords(capture)));
 				}
 
 				capture = Add(start, dir * 1, -1);
 				if (boardMatrix[capture] == opponentColor)
 				{
-					result.Add(new RawOption(
-						EventType.Capture, BoardMatrix.ConvertCoords(capture)));
+					result.Add(new MoveOption(
+						MoveType.Capture, BoardMatrix.ConvertCoords(capture)));
 				}
 			}
 
@@ -266,8 +279,8 @@ namespace Chess.Models
 			{
 				var nextRegular = Add(start, dir * 2, 0);
 				if (null == boardMatrix[nextRegular])
-					result.Add(new RawOption(
-						EventType.Regular, BoardMatrix.ConvertCoords(nextRegular)));
+					result.Add(new MoveOption(
+						MoveType.Regular, BoardMatrix.ConvertCoords(nextRegular)));
 			}
 
 			return result;
