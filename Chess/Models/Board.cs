@@ -57,15 +57,8 @@ namespace Chess.Models
 
 		public Player this[Color playerColor] => playerColor == Color.White ? White : Black;
 
-		public CellHandle this[string position]
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
-
-		public CellHandle this[Piece piece] => this[piece.Position];
+		public CellHandle this[string position] => GetCellHandle(position, null);
+		public CellHandle this[Piece piece] => GetCellHandle(piece.PieceString, piece.Color);
 
 		public Board()
 		{
@@ -76,7 +69,19 @@ namespace Chess.Models
 
 		public BoardMatrix GetMatrix()
 		{
-			throw new NotImplementedException();
+			Color?[,] matrix = new Color?[8, 8];
+			foreach (var ps in White.PieceStrings)
+			{
+				var coords = BoardMatrix.ConvertToTupleCoords(ps.Substring(1, 2));
+				matrix[coords.Item1, coords.Item2] = Color.White;
+			}
+			foreach (var ps in Black.PieceStrings)
+			{
+				var coords = BoardMatrix.ConvertToTupleCoords(ps.Substring(1, 2));
+				matrix[coords.Item1, coords.Item2] = Color.Black;
+			}
+
+			return new BoardMatrix { M = matrix };
 		}
 
 		public void PushHistory(HistoryEntry move)
@@ -91,7 +96,12 @@ namespace Chess.Models
 
 		public HistoryEntry GetLastEntryForCell(string position)
 		{
-			throw new NotImplementedException();
+			if (null == position || position.Length != 2)
+				throw new ArgumentException();
+
+			return History.LastOrDefault(e =>
+				e.Move.Destination == position ||
+				ChessUtil.ExtractPosition(e.PieceString) == position);
 		}
 
 		#region Equals
@@ -129,7 +139,7 @@ namespace Chess.Models
 			return hash;
 		}
 		#endregion
-
+		#region Cloneable
 		public Board Clone()
 		{
 			return (Board)((ICloneable)this).Clone();
@@ -137,29 +147,92 @@ namespace Chess.Models
 
 		object ICloneable.Clone()
 		{
-			throw new NotImplementedException();
+			var clone = new Board
+			{
+				Id = Id,
+				Caption = Caption,
+				CreatedAt = CreatedAt,
+				LastModifiedAt = LastModifiedAt,
+				History = new List<HistoryEntry>(History),
+			};
+
+			clone.White = White.Clone();
+			clone.Black = Black.Clone();
+
+			return clone;
 		}
+		#endregion
+
+		private CellHandle GetCellHandle(string position, Color? color)
+		{
+			if (string.IsNullOrEmpty(position) || !(position.Length == 2 || position.Length == 3))
+				throw new ArgumentException($"Invalid position: '{position}'", nameof(position));
+
+			string pieceString;
+			if(null != color)
+			{
+				pieceString = this[color.Value].PieceStrings.FirstOrDefault(p => p.EndsWith(position));
+			}
+			else
+			{
+				pieceString = White.PieceStrings.FirstOrDefault(p => p.EndsWith(position));
+				if(null == pieceString)
+				{
+					pieceString = Black.PieceStrings.FirstOrDefault(p => p.EndsWith(position));
+					color = Color.Black;
+				}
+				else
+				{
+					color = Color.White;
+				}
+            }
+
+			if(null == pieceString)
+				throw new ArgumentException($"Could not find: '{position}'", nameof(position));
+
+			return new CellHandle(this, color.Value, pieceString);
+		}
+
 
 		public class CellHandle
 		{
-			public CellHandle(Board owner)
-			{
+			public string PieceString { get; }
+			public Color Color { get; }
+			public Board Board { get; }
 
+			public Piece Piece => PieceFactory.Create(Color, PieceString);
+
+			private bool _used = false;
+
+			public CellHandle(Board owner, Color color, string pieceString)
+			{
+				Board = owner;
+				Color = color;
+				PieceString = pieceString;
 			}
 
 			public void Remove()
 			{
-				throw new NotImplementedException();
+				if (_used)
+					throw new InvalidOperationException("Used");
+				Board[Color].PieceStrings.Remove(PieceString);
+				_used = true;
 			}
 
 			public void Move(string dest, char? promotionPiece = null)
 			{
-				//board[piece.Color].RemovePieceAt(piece.Position);
-				//board[piece.Color].AddPiece(promotionPiece ?? piece.CharType, option.Destination);
-				//board[piece.Color.Invert()].RemovePieceAt(option.Destination);
+				if (_used)
+					throw new InvalidOperationException("Used");
+				if(Board[Color].PieceStrings.Any(p => p.EndsWith(dest)))
+					throw new InvalidOperationException($"{dest} is already occupied");
 
-
-				throw new NotImplementedException();
+				var targetPieceString = ChessUtil.ComposePieceString(promotionPiece ?? PieceString[0], dest);
+                Board[Color].PieceStrings.Remove(PieceString);
+				Board[Color].PieceStrings.Add(targetPieceString);
+				var opponentPiece = Board[Color.Invert()].PieceStrings.FirstOrDefault(p => p.EndsWith(dest));
+				if (null != opponentPiece)
+					Board[Color.Invert()].PieceStrings.Remove(opponentPiece);
+				_used = true;
 			}
 		}
 	}

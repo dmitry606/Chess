@@ -144,8 +144,7 @@ namespace Chess.Models
 
 		public King(Color color, string pieceString) : base(color, pieceString) { }
 
-		public King(Player player) 
-			:base(player.Color, player.PieceStrings.SingleOrDefault(s => s[0] == King))
+		public King(Player player) : base(player.Color, GetKingString(player))
 		{
 		}
 
@@ -200,6 +199,20 @@ namespace Chess.Models
 
 			var row = Color == Color.White ? "1" : "8";
 			return chars.Select(c => c + row).ToList();
+		}
+
+		private static string GetKingString(Player player)
+		{
+			if (null == player)
+			{
+				throw new ArgumentNullException(nameof(player));
+			}
+			var str = player.PieceStrings.FirstOrDefault(s => s[0] == King);
+			if (null == str)
+			{
+				throw new InvalidOperationException($"King was not found in {player.Color}");
+			}
+			return str;
 		}
 	}
 

@@ -73,7 +73,7 @@ namespace Chess.Repositories.Concrete.Tests
 		public void Board_with_non_existent_id_is_not_saved()
 		{
 			var rep = GetRepository();
-			var board = BoardFactory.ConstructBoard();
+			var board = BoardFactory.ConstructSomeBoard();
 			board.Id = ObjectId.GenerateNewId().ToString();
 
 			UnpackAggregateExceptionSingle(
@@ -87,7 +87,7 @@ namespace Chess.Repositories.Concrete.Tests
 		public void Board_can_be_saved_and_read_correctly()
 		{
 			var rep = GetRepository();
-			var original = BoardFactory.ConstructBoard();
+			var original = BoardFactory.ConstructSomeBoard();
 
 			rep.SaveBoardAsync(original).Wait();
 			var retrieved = rep.GetBoardAsync(original.Id).GetAwaiter().GetResult();
@@ -100,7 +100,7 @@ namespace Chess.Repositories.Concrete.Tests
 		public void Board_can_be_changed()
 		{
 			var rep = GetRepository();
-			var original = BoardFactory.ConstructBoard();
+			var original = BoardFactory.ConstructSomeBoard();
 
 			rep.SaveBoardAsync(original).Wait();
 			var retrieved = rep.GetBoardAsync(original.Id).GetAwaiter().GetResult();
@@ -119,7 +119,7 @@ namespace Chess.Repositories.Concrete.Tests
 		public void GetAll_works()
 		{
 			var rep = GetRepository();
-			var boards = Enumerable.Range(0, 20).Select(i => BoardFactory.ConstructBoard()).ToList();
+			var boards = Enumerable.Range(0, 20).Select(i => BoardFactory.ConstructSomeBoard()).ToList();
 
 			var tasks = boards.Select(g => rep.SaveBoardAsync(g)).ToArray();
 			Task.WaitAll(tasks);

@@ -9,12 +9,38 @@ namespace Chess.Tests
 {
 	public static class BoardFactory
 	{
-		public static Board ConstructBoard()
+		public static Board ConstructInitialBoard()
 		{
 			return new Board
 			{
-				//CreatedAt = new DateTime(2015, 10, 10, ),
-				//LastModifiedAt = new DateTime
+				Caption = "Initial test board",
+
+				White = new Player
+				{
+					Name = "White player",
+					PieceStrings = new List<string>
+					{
+						"pa2", "pb2", "pc2", "pd2", "pe2", "pf2", "pg2", "ph2",
+						"Ra1", "Nb1", "Bc1", "Qd1", "Ke1", "Bf1", "Ng1", "Rh1"
+					}
+				},
+
+				Black = new Player
+				{
+					Name = "Black player",
+					PieceStrings = new List<string>
+					{
+						"pa7", "pb7", "pc7", "pd7", "pe7", "pf7", "pg7", "ph7",
+						"Ra8", "Nb8", "Bc8", "Qd8", "Ke8", "Bf8", "Ng8", "Rh8"
+					}
+				},
+			};
+		}
+
+		public static Board ConstructSomeBoard()
+		{
+			return new Board
+			{
 				Caption = "Awesome game",
 
 				White = new Player
@@ -44,7 +70,7 @@ namespace Chess.Tests
 			};
 		}
 
-		public static Board ConstructAnotherGame()
+		public static Board ConstructAnotherBoard()
 		{
 			return new Board
 			{
@@ -77,5 +103,15 @@ namespace Chess.Tests
 				}
 			};
 		}
+
+		public static Board GetBoard(string[] white, string[] black)
+		{
+			var board = new Board();
+			board.White.PieceStrings = white.ToList();
+			board.Black.PieceStrings = black.ToList();
+
+			return board;
+		}
+
 	}
 }

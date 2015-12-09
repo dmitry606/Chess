@@ -69,6 +69,8 @@
     <Compile Include="Models\BoardMatrixTests.cs" />
     <Compile Include="Models\BoardTests.cs" />
     <Compile Include="Models\ChessUtilTests.cs" />
+    <Compile Include="Models\GameProcessorTests.cs" />
+    <Compile Include="Models\PieceFactoryTests.cs" />
     <Compile Include="Models\PieceTests.cs" />
     <Compile Include="UnitTestUtil.cs" />
     <Compile Include="Repositories\MongoBoardRepositoryTests.cs" />

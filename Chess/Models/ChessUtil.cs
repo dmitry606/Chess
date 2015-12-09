@@ -9,9 +9,7 @@ namespace Chess.Models
 	{
 		public static char ExtractCharType(string pieceString) => pieceString[0];
 		public static string ExtractPosition(string pieceString) => pieceString.Substring(1, 2);
-
 		public static string ComposePieceString(char charType, string position) => charType + position;
-		//public static string ComposePieceStringFromMove(MoveHistoryEntry info) => info.PieceString[0] + info.Destination;
 
 		public static Color Invert(this Color c)
 		{

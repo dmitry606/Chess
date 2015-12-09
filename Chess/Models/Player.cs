@@ -6,7 +6,7 @@ using Chess.Utils;
 
 namespace Chess.Models
 {
-	public class Player
+	public class Player : ICloneable
 	{
 		public string Name { get; set; }
 		public List<string> PieceStrings { get; set; } = new List<string>();
@@ -15,8 +15,6 @@ namespace Chess.Models
 		public Color Color => Board.White == this ? Color.White : Color.Black;
 		public Player Opponent => Board.White == this ? Board.Black : Board.White;
 		public List<Piece> Pieces => PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
-
-		public List<MoveOption> GetLegalMoves(string position) => GetLegalMoves(FindPiece(position));
 
 		public void MakeMove(string from, string to, char? promotionTarget = null)
 		{
@@ -32,28 +30,23 @@ namespace Chess.Models
 			if (null == move)
 				throw new ArgumentException($"Move to {to} is not possible", nameof(to));
 
-			var gameState = new GameGraph(Board).Execute(piece, move, promotionTarget);
-
-			Board.PushHistory(new HistoryEntry
-			{
-				Move = move,
-				PieceString = piece.PieceString,
-				ResultingEvent = gameState
-			});
+			new GameProcessor(Board).Execute(piece, move, promotionTarget);
 		}
 
-		private List<MoveOption> GetLegalMoves(Piece piece)
+		public List<MoveOption> GetLegalMoves(string position)
 		{
-			var options = piece.GetTechnicalMoves(Board.GetMatrix());
-			return new GameGraph(Board).FilterOptions(piece, options);
+			var piece = FindPiece(position);
+            var options = piece.GetTechnicalMoves(Board.GetMatrix());
+
+			return new GameProcessor(Board).FilterOptions(piece, options);
 		}
 
 		private Piece FindPiece(string position)
 		{
-			var index = PieceStrings.FindIndex(s => s.EndsWith(position));
-			if (-1 == index)
+			var pieceString = PieceStrings.FirstOrDefault(s => s.EndsWith(position));
+			if (null == pieceString)
 				throw new ArgumentException($"No piece at '{position}'", nameof(position));
-			return PieceFactory.Create(this, index);
+			return PieceFactory.Create(Color, pieceString);
 		}
 
 		#region Equals
@@ -74,6 +67,20 @@ namespace Chess.Models
 			hash = hash * 31 + PieceStrings.SequenceGetHashCode();
 			hash = hash * 31 + Name?.GetHashCode() ?? 0;
 			return hash;
+		}
+
+		public Player Clone()
+		{
+			return (Player)((ICloneable)this).Clone();
+		}
+
+		object ICloneable.Clone()
+		{
+			return new Player
+			{
+				Name = this.Name,
+				PieceStrings = new List<string>(this.PieceStrings)
+			};
 		}
 		#endregion
 	}
