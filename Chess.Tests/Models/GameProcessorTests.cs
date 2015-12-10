@@ -17,7 +17,7 @@ namespace Chess.Models.Tests
 		{
 			new GameProcessor(new Board());
 			UnitTestUtil.AssertThrows<ArgumentNullException>(() => new GameProcessor(null));
-        }
+		}
 
 		[TestMethod]
 		public void UsualMovesAllowed()
@@ -140,7 +140,7 @@ namespace Chess.Models.Tests
 		{
 			var board = BoardFactory.GetBoard(new[] { "Rc2", "Ke1" }, new[] { "Bd6", "Kc6" });
 			var piece = new Bishop(Color.Black, "Bd6");
-            var moves = new List<MoveOption>
+			var moves = new List<MoveOption>
 			{
 				new MoveOption(MoveType.Regular, "c7")
 			};
@@ -181,7 +181,7 @@ namespace Chess.Models.Tests
 			var moves = new List<MoveOption>
 			{
 				new MoveOption(MoveType.Castling, "c1"),
-                new MoveOption(MoveType.Castling, "g1"),
+				new MoveOption(MoveType.Castling, "g1"),
 			};
 
 			var actual = gproc.FilterOptions(piece, moves);
@@ -266,11 +266,101 @@ namespace Chess.Models.Tests
 			Assert.AreEqual(0, actual.Count);
 		}
 
-
-		[TestMethod()]
-		public void ExecuteTest()
+		[TestMethod]
+		public void Execute_UsualMovesExecutedAndHistoryUpdated()
 		{
-			Assert.Fail();
+			var board = BoardFactory.ConstructInitialBoard();
+			var gproc = new GameProcessor(board);
+
+			var gameEvent = gproc.Execute(
+				new Pawn(Color.White, "pe2"),
+				new MoveOption(MoveType.Regular, "e4"));
+			Assert.IsNull(gameEvent);
+			Assert.IsTrue(board.White.PieceStrings.Contains("pe4"));
+			Assert.IsFalse(board.White.PieceStrings.Contains("pe2"));
+
+			gameEvent = gproc.Execute(
+				new Pawn(Color.Black, "pb7"),
+				new MoveOption(MoveType.Regular, "b6"));
+			Assert.IsNull(gameEvent);
+			Assert.IsTrue(board.Black.PieceStrings.Contains("pb6"));
+			Assert.IsFalse(board.Black.PieceStrings.Contains("pb7"));
+
+			Assert.AreEqual(2, board.History.Count);
+			Assert.IsTrue(board.History.All(h => h.ResultingEvent == null));
+			Assert.AreEqual("pe2", board.History[0].PieceString);
+			Assert.AreEqual("pb7", board.History[1].PieceString);
+		}
+
+		[TestMethod]
+		public void Execute_CantMoveOneColorTwice()
+		{
+			var board = BoardFactory.ConstructInitialBoard();
+			var gproc = new GameProcessor(board);
+
+			gproc.Execute(
+				new Pawn(Color.White, "pe2"),
+				new MoveOption(MoveType.Regular, "e4"));
+
+			UnitTestUtil.AssertThrows<InvalidOperationException>(() =>
+				gproc.Execute(
+					new Pawn(Color.White, "pa2"),
+					new MoveOption(MoveType.Regular, "a4")));
+		}
+
+		[TestMethod]
+		public void Execute_ThrowsExcIfMoveNotAllowed()
+		{
+			var board = BoardFactory.GetBoard(new[] { "Kc3", "pc4", "Nf2" }, new[] { "Be5", "Rb8", "Kc7" });
+			var piece = new Pawn(Color.White, "pc4");
+			var move = new MoveOption(MoveType.Regular, "c5");
+			var gproc = new GameProcessor(board);
+
+			UnitTestUtil.AssertThrows<InvalidOperationException>(() => gproc.Execute(piece, move));
+		}
+
+		[TestMethod]
+		public void Execute_DrawWorks()
+		{
+			var board = BoardFactory.GetBoard(
+				new[] { "pa6", "Bc8", "Rh5", "Bd4", "Kh8", "Rb1", "pa3" },
+                new[] { "Ka5", "pa4", "Nb5" });
+			var piece = new King(Color.White, "Kh8");
+			var move = new MoveOption(MoveType.Regular, "g8");
+			var gproc = new GameProcessor(board);
+
+			var res = gproc.Execute(piece, move);
+			Assert.AreEqual(GameEvent.Draw, res);
+		}
+
+		[TestMethod]
+		public void Execute_CheckWorks()
+		{
+			var board = BoardFactory.ConstructInitialBoard();
+			board.Black.PieceStrings.Remove("pd7");
+			board.Black.PieceStrings.Remove("pc2");
+
+			var piece = new Queen(Color.White, "Qd1");
+			var move = new MoveOption(MoveType.Regular, "a4");
+			var gproc = new GameProcessor(board);
+
+			var res = gproc.Execute(piece, move);
+			Assert.AreEqual(GameEvent.Check, res);
+		}
+
+		[TestMethod]
+		public void Execute_CheckmateWorks()
+		{
+			var board = BoardFactory.GetBoard(
+				new[] { "pe7", "Bf6", "Rd5", "Bc4", "Kh1"},
+				new[] {"Ke8", "Bf8", "pf7"});
+
+			var piece = new Bishop(Color.White, "Bc4");
+			var move = new MoveOption(MoveType.Regular, "b5");
+			var gproc = new GameProcessor(board);
+
+			var res = gproc.Execute(piece, move);
+			Assert.AreEqual(GameEvent.Checkmate, res);
 		}
 
 	}

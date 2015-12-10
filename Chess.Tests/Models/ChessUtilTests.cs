@@ -17,7 +17,7 @@ namespace Chess.Models.Tests
 		public void ComposePieceStringTest()
 		{
 			Assert.AreEqual("Qe1", ChessUtil.ComposePieceString('Q', "e1"));
-			Assert.AreEqual("Q", ChessUtil.ExtractCharType("Qe2"));
+			Assert.AreEqual('Q', ChessUtil.ExtractCharType("Qe2"));
 			Assert.AreEqual("e2", ChessUtil.ExtractPosition("Qe2"));
 		}
 

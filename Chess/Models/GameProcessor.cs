@@ -36,11 +36,14 @@ namespace Chess.Models
 				throw new ArgumentException("Invalid promotion");
 			}
 
+			if (SourceBoard.GetLastMovePlayerColor() == piece.Color)
+				throw new InvalidOperationException($"It's not {piece.Color} turn");
+
 			if (!IsAllowed(piece, move))
-				throw new ArgumentException($"Move to {move.Destination} is not legal");
+				throw new InvalidOperationException($"Move to {move.Destination} is not legal");
 
 			var histEntry = ApplyMove(SourceBoard, piece, move, promotionPiece);
-			var gameState = EvaluateGameState(piece.Color);
+			var gameState = EvaluateGameState();
 			histEntry.ResultingEvent = gameState;
 			return gameState;
         }
@@ -90,24 +93,24 @@ namespace Chess.Models
 			return true;
 		}
 
-		private GameEvent? EvaluateGameState(Color color)
+		private GameEvent? EvaluateGameState()
 		{
-			var king = new King(SourceBoard[color]);
-			if (IsUnderAttack(SourceBoard, king.Position, color.Invert()))
-			{
-				var kingMoves = FilterOptions(king, king.GetTechnicalMoves(SourceBoard.GetMatrix()));
-				return kingMoves.Any() ? GameEvent.Check : GameEvent.Checkmate;
-			}
+			var color = SourceBoard.GetLastMovePlayerColor().Invert();
 
-			//if the opponent does not have any legal moves left, then it's a draw
-			foreach (var piece in SourceBoard[color.Invert()].Pieces)
+			var hasMoves = false;
+			foreach (var piece in SourceBoard[color].Pieces)
 			{
 				var moves = FilterOptions(piece, piece.GetTechnicalMoves(SourceBoard.GetMatrix()));
 				if (moves.Any())
-					return null;
+				{
+					hasMoves = true;
+					break;
+				}
 			}
 
-			return GameEvent.Draw;
+			return IsInCheck(SourceBoard, color) ?
+				(hasMoves ? GameEvent.Check : GameEvent.Checkmate) :
+				(hasMoves ? (GameEvent?)null : GameEvent.Draw);
         }
 
 		private static HistoryEntry ApplyMove(Board board, Piece piece, MoveOption move, char? promotionPiece = null)
@@ -141,9 +144,9 @@ namespace Chess.Models
 			return histEntry;
 		}
 
-		private static bool IsInCheck(Board board, Color color)
+		private static bool IsInCheck(Board board, Color playerColor)
 		{
-			return IsUnderAttack(board, new King(board[color]).Position, color.Invert());
+			return IsUnderAttack(board, new King(board[playerColor]).Position, playerColor.Invert());
 		}
 
 		private static bool IsUnderAttack(Board board, string position, Color fromColor)

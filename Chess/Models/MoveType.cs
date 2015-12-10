@@ -71,7 +71,6 @@ namespace Chess.Models
 			return hash;
 		}
 		#endregion
-
 	}
 
 	public class MoveOption : IEquatable<MoveOption>

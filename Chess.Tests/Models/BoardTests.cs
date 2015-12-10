@@ -111,21 +111,43 @@ namespace Chess.Models.Tests
         }
 
 		[TestMethod]
-		public void PushHistory_test()
-		{
-			Assert.Fail();
-		}
-
-		[TestMethod]
 		public void PeekHistory_test()
 		{
-			Assert.Fail();
-		}
+			var board = new Board();
+
+			board.PushHistory(new HistoryEntry("pe2", "e4", MoveType.Regular));
+			board.PushHistory(new HistoryEntry("Qd2", "b7", MoveType.Regular));
+			board.PushHistory(new HistoryEntry("Ke2", "d6", MoveType.Regular));
+
+			Assert.AreEqual("Ke2", board.PeekHistory().PieceString);
+        }
 
 		[TestMethod]
 		public void GetLastEntry_test()
 		{
-			Assert.Fail();
+			var board = new Board();
+
+			board.PushHistory(new HistoryEntry("pe2", "e4", MoveType.Regular));
+			board.PushHistory(new HistoryEntry("Qd2", "b7", MoveType.Regular));
+			board.PushHistory(new HistoryEntry("Be4", "d2", MoveType.Regular));
+			board.PushHistory(new HistoryEntry("Ke2", "d6", MoveType.Regular));
+
+			Assert.AreEqual("Be4", board.GetLastEntryForCell("d2").PieceString);
+		}
+
+		[TestMethod]
+		public void GetLastMovePlayerColor_test()
+		{
+			var board = new Board();
+
+			board.PushHistory(new HistoryEntry("pe2", "e4", MoveType.Regular));
+			Assert.AreEqual(Color.White, board.GetLastMovePlayerColor());
+
+			board.PushHistory(new HistoryEntry("Qd2", "b7", MoveType.Regular));
+			Assert.AreEqual(Color.Black, board.GetLastMovePlayerColor());
+
+			board.PushHistory(new HistoryEntry("Ke2", "d6", MoveType.Regular));
+			Assert.AreEqual(Color.White, board.GetLastMovePlayerColor());
 		}
 
 		[TestMethod]

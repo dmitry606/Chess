@@ -94,6 +94,11 @@ namespace Chess.Models
 			return History.LastOrDefault();
 		}
 
+		public Color GetLastMovePlayerColor()
+		{
+			return History.Count % 2 == 0 ? Color.Black : Color.White;
+		}
+
 		public HistoryEntry GetLastEntryForCell(string position)
 		{
 			if (null == position || position.Length != 2)
