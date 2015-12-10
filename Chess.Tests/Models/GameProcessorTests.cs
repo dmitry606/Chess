@@ -84,6 +84,13 @@ namespace Chess.Models.Tests
 
 			var actual = gproc.FilterOptions(piece, moves);
 			Assert.AreEqual(0, actual.Count);
+
+			board.History = new List<HistoryEntry>
+			{
+				new HistoryEntry("pd3", "d4", MoveType.Capture),
+			};
+			actual = gproc.FilterOptions(piece, moves);
+			Assert.AreEqual(0, actual.Count);
 		}
 
 
