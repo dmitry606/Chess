@@ -73,10 +73,12 @@ namespace Chess.Models
 					if (!(piece is Pawn))
 						throw new ArgumentException($"{move.Event} is not allowed for {piece}");
 
-					//ensure that the opponent's last move was of a pawn to the enpassant position
-					var expected = ChessUtil.ComposePieceString(Piece.Pawn, move.SpecialCapturePosition);
-					if (SourceBoard.PeekHistory().PieceString != expected)
-						return false;
+					var lastHistEntry = SourceBoard.PeekHistory();
+                    if (lastHistEntry == null ||
+						lastHistEntry.Move.Destination != move.SpecialCapturePosition || 
+						lastHistEntry.PieceString[0] != Piece.Pawn ||
+						Math.Abs(lastHistEntry.PieceString[2] - lastHistEntry.Move.Destination[1]) != 2)
+                        return false;
 				}
 
 				var clone = SourceBoard.Clone();

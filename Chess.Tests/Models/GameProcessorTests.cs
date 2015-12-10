@@ -13,7 +13,7 @@ namespace Chess.Models.Tests
 	public class GameProcessorTests
 	{
 		[TestMethod()]
-		public void GameProcessorTest()
+		public void GameProcessorCtorTest()
 		{
 			new GameProcessor(new Board());
 			UnitTestUtil.AssertThrows<ArgumentNullException>(() => new GameProcessor(null));
@@ -150,7 +150,23 @@ namespace Chess.Models.Tests
 		}
 
 		[TestMethod]
-		public void CastlingCanBeMade()
+		public void CastlingCanBeMade_black()
+		{
+			var board = BoardFactory.GetBoard(new[] { "Ke1", }, new[] { "Ra8", "Ke8", "Rh8" });
+			var gproc = new GameProcessor(board);
+			var piece = new King(Color.Black, "Ke8");
+			var moves = new List<MoveOption>
+			{
+				new MoveOption(MoveType.Castling, "c8"),
+				new MoveOption(MoveType.Castling, "g8"),
+			};
+
+			var actual = gproc.FilterOptions(piece, moves);
+			Assert.AreEqual(2, actual.Count);
+		}
+
+		[TestMethod]
+		public void CastlingCanBeMade_white()
 		{
 			var board = BoardFactory.GetBoard(new[] { "Ra1", "Ke1", "Rh1" }, new[] { "Kc8" });
 			var gproc = new GameProcessor(board);
