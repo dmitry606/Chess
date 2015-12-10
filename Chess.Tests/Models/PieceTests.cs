@@ -286,18 +286,37 @@ namespace Chess.Tests.Models
 			board["e4"] = Color.Black;
 			piece = new Pawn(Color.Black, "pe4");
 			board["f3"] = Color.White;
+			board["d3"] = Color.Black; //remove enpassant
 
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(2, moves.Count);
 			Assert.AreEqual("f3", moves.Single(m => m.Event == MoveType.Capture).Destination);
 			Assert.AreEqual("e3", moves.Single(m => m.Event == MoveType.Regular).Destination);
 			Assert.IsTrue(moves.All(m => m.Secondary == null));
+		}
+
+		[TestMethod]
+		public void PawnTests_black_borders()
+		{
+			var board = BoardMatrixFactory.GetInitialBoard();
 
 			board["d1"] = Color.Black;
-			piece = new Pawn(Color.Black, "pd1");
+			var piece = new Pawn(Color.Black, "pd1");
+			var moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(0, moves.Count);
+
+			board["a1"] = Color.Black;
+			piece = new Pawn(Color.Black, "pa1");
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(0, moves.Count);
+
+			board["h1"] = Color.Black;
+			piece = new Pawn(Color.Black, "ph1");
+			moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(0, moves.Count);
+
 		}
+
 
 		[TestMethod]
 		public void PawnTests_white()
@@ -346,17 +365,36 @@ namespace Chess.Tests.Models
 			Assert.AreEqual("f5", moves.Single(m => m.Event == MoveType.Capture).Destination);
 			Assert.AreEqual("e5", moves.Single(m => m.Event == MoveType.Regular).Destination);
 			Assert.IsTrue(moves.All(m => m.Secondary == null));
+		}
+
+
+
+		[TestMethod]
+		public void PawnTests_white_borders()
+		{
+			var board = BoardMatrixFactory.GetInitialBoard();
 
 			board["d8"] = Color.White;
-			piece = new Pawn(Color.White, "pd8");
+			var piece = new Pawn(Color.White, "pd8");
+			var moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(0, moves.Count);
+
+			board["a8"] = Color.White;
+			piece = new Pawn(Color.White, "pa8");
+			moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(0, moves.Count);
+
+			board["h8"] = Color.White;
+			piece = new Pawn(Color.White, "ph8");
 			moves = piece.GetTechnicalMoves(board);
 			Assert.AreEqual(0, moves.Count);
 		}
 
+
 		[TestMethod]
 		public void PawnTests_black_promotion()
 		{
-			var board = BoardMatrixFactory.GetInitialBoard();
+			var board = BoardMatrixFactory.GetEmptyBoard();
 			board["g2"] = Color.Black;
 			var piece = new Pawn(Color.Black, "pg2");
 			board["h1"] = Color.White;
@@ -378,7 +416,7 @@ namespace Chess.Tests.Models
 		[TestMethod]
 		public void PawnTests_white_promotion()
 		{
-			var board = BoardMatrixFactory.GetInitialBoard();
+			var board = BoardMatrixFactory.GetEmptyBoard();
 			board["g7"] = Color.White;
 			var piece = new Pawn(Color.White, "pg7");
 			board["h8"] = Color.Black;
@@ -396,7 +434,6 @@ namespace Chess.Tests.Models
 			Assert.AreEqual(MoveType.Capture, m.Event);
 			Assert.AreEqual(SecondaryMoveType.Promotion, m.Secondary);
 		}
-
 
 		[TestMethod]
 		public void PawnTests_black_enpassant()
@@ -430,6 +467,29 @@ namespace Chess.Tests.Models
 		}
 
 		[TestMethod]
+		public void PawnTests_black_enpassant_borders()
+		{
+			var board = BoardMatrixFactory.GetEmptyBoard();
+			board["a4"] = Color.Black;
+			var piece = new Pawn(Color.Black, "pa4");
+			board["a3"] = Color.Black;
+			var moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(1, moves.Count);
+			var m = moves.First();
+			Assert.AreEqual(SecondaryMoveType.EnPassant, m.Secondary);
+			Assert.AreEqual("b4", m.SpecialCapturePosition);
+
+			board["h4"] = Color.Black;
+			piece = new Pawn(Color.Black, "ph4");
+			board["h3"] = Color.Black;
+			moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(1, moves.Count);
+			m = moves.First();
+			Assert.AreEqual(SecondaryMoveType.EnPassant, m.Secondary);
+			Assert.AreEqual("g4", m.SpecialCapturePosition);
+		}
+
+		[TestMethod]
 		public void PawnTests_white_enpassant()
 		{
 			var board = BoardMatrixFactory.GetInitialBoard();
@@ -457,6 +517,29 @@ namespace Chess.Tests.Models
 				.Where(m => m.Secondary.HasValue)
 				.ToList();
 			Assert.AreEqual("b5", moves.First().SpecialCapturePosition);
+		}
+
+		[TestMethod]
+		public void PawnTests_white_enpassant_borders()
+		{
+			var board = BoardMatrixFactory.GetEmptyBoard();
+			board["a5"] = Color.White;
+			var piece = new Pawn(Color.White, "pa5");
+			board["a6"] = Color.White;
+			var moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(1, moves.Count);
+			var m = moves.First();
+			Assert.AreEqual(SecondaryMoveType.EnPassant, m.Secondary);
+			Assert.AreEqual("b5", m.SpecialCapturePosition);
+
+			board["h5"] = Color.White;
+			piece = new Pawn(Color.White, "ph5");
+			board["h6"] = Color.White;
+			moves = piece.GetTechnicalMoves(board);
+			Assert.AreEqual(1, moves.Count);
+			m = moves.First();
+			Assert.AreEqual(SecondaryMoveType.EnPassant, m.Secondary);
+			Assert.AreEqual("g5", m.SpecialCapturePosition);
 		}
 
 

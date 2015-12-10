@@ -247,56 +247,75 @@ namespace Chess.Models
 	{
 		public override char CharType => Pawn;
 
-		public Pawn(Color color, string pieceString) : base(color, pieceString) { }
+		//private int _enpassantRow;
+		//private int _promotionRow;
+		private bool _atPromotion;
+		private bool _atEnpassant;
+		private bool _atInitial;
 
-		//public override string GetCapturePosition(MoveOption move)
-		//{
-		//	return move.Secondary == SecondaryMoveType.EnPassant ?
-		//		move.Destination[0].ToString() + Position[1] : move.Destination;
-  //      }
+		private Tuple<int, int> _start;
+
+		public Pawn(Color color, string pieceString) : base(color, pieceString)
+		{
+			_start = BoardMatrix.ConvertToTupleCoords(Position);
+			_atEnpassant = _start.Item1 == (Color == Color.Black ? 4 : 3);
+			_atPromotion = _start.Item1 == (Color == Color.Black ? 6 : 1);
+			_atInitial = _start.Item1 == (Color == Color.Black ? 1 : 6);
+        }
 
 		public override List<MoveOption> GetTechnicalMoves(BoardMatrix boardMatrix)
 		{
-			var start = BoardMatrix.ConvertToTupleCoords(Position);
-			Debug.Assert(boardMatrix[start] == Color);
+			Debug.Assert(boardMatrix[_start] == Color);
 			var dir = Color == Color.Black ? +1 : -1;
-
 			var result = new List<MoveOption>();
 
-			if ((Color == Color.Black)? (start.Item1 <= 6) : (start.Item1 >= 1))
+			if ((Color == Color.Black)? (_start.Item1 <= 6) : (_start.Item1 >= 1))
 			{
-				var nextRegular = Add(start, dir * 1, 0);
+				var nextRegular = Add(_start, dir * 1, 0);
 				if (null == boardMatrix[nextRegular])
 				{
-					result.Add(new MoveOption(
-						MoveType.Regular, BoardMatrix.ConvertCoords(nextRegular)));
-				}
-
-				var capture = Add(start, dir * 1, 1);
-				var opponentColor = Color == Color.White ? Color.Black : Color.White;
-                if (boardMatrix[capture] == opponentColor)
-				{
-					result.Add(new MoveOption(
-						MoveType.Capture, BoardMatrix.ConvertCoords(capture)));
-				}
-
-				capture = Add(start, dir * 1, -1);
-				if (boardMatrix[capture] == opponentColor)
-				{
-					result.Add(new MoveOption(
-						MoveType.Capture, BoardMatrix.ConvertCoords(capture)));
+					var move = new MoveOption(MoveType.Regular, BoardMatrix.ConvertCoords(nextRegular));
+					if (_atPromotion)
+						move.Secondary = SecondaryMoveType.Promotion;
+                    result.Add(move);
 				}
 			}
 
-			if (start.Item1 == (Color == Color.Black? 1 : 6))
+			Capture(Add(_start, dir * 1, 1), boardMatrix, result);
+			Capture(Add(_start, dir * 1, -1), boardMatrix, result);
+
+			if (_atInitial)
 			{
-				var nextRegular = Add(start, dir * 2, 0);
-				if (null == boardMatrix[nextRegular])
+				var doubleMove = Add(_start, dir * 2, 0);
+				if (null == boardMatrix[doubleMove])
 					result.Add(new MoveOption(
-						MoveType.Regular, BoardMatrix.ConvertCoords(nextRegular)));
+						MoveType.Regular, BoardMatrix.ConvertCoords(doubleMove)));
 			}
 
 			return result;
+		}
+
+		private void Capture(Tuple<int, int> capture, BoardMatrix boardMatrix, List<MoveOption> result)
+		{
+			if (!BoardMatrix.IsValidCoords(capture))
+				return;
+
+			var opponentColor = Color.Invert();
+			var move = new MoveOption(MoveType.Capture, BoardMatrix.ConvertCoords(capture));
+
+			if (boardMatrix[capture] == opponentColor)
+			{
+				if (_atPromotion)
+					move.Secondary = SecondaryMoveType.Promotion;
+
+				result.Add(move);
+			}
+			else if (_atEnpassant && boardMatrix[capture] == null)
+			{
+				move.Secondary = SecondaryMoveType.EnPassant;
+				move.SpecialCapturePosition = BoardMatrix.ConvertCoords(_start.Item1, capture.Item2);
+				result.Add(move);
+			}
 		}
 	}
 
