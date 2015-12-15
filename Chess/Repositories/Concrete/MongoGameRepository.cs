@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Chess.Engine;
+using Chess.Models;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Diagnostics;
 
 namespace Chess.Repositories.Concrete
 {
-	public class MongoBoardRepository : IBoardRepository
+	public class MongoGameRepository : IGameRepository
 	{
 		public const string CONNECTION_STRING_NAME = "Chess";
 		public const string DEFAULT_DATABASE_NAME = "chess";
@@ -20,30 +20,30 @@ namespace Chess.Repositories.Concrete
 
 		private readonly IMongoClient _client;
 		private readonly IMongoDatabase _database;
-		private readonly IMongoCollection<Board> _boardsCollection;
+		private readonly IMongoCollection<Game> _boardsCollection;
 
-		public MongoBoardRepository() : this(DEFAULT_DATABASE_NAME)
+		public MongoGameRepository() : this(DEFAULT_DATABASE_NAME)
 		{ }
 
-		public MongoBoardRepository(string databaseName) 
+		public MongoGameRepository(string databaseName) 
 		{
 			var connectionString = ConfigurationManager.ConnectionStrings[CONNECTION_STRING_NAME].ConnectionString;
 			_client = new MongoClient(connectionString);
 			_database = _client.GetDatabase(databaseName);
-			_boardsCollection = _database.GetCollection<Board>(GAMES_COLLECTION_NAME);
+			_boardsCollection = _database.GetCollection<Game>(GAMES_COLLECTION_NAME);
         }
 
-		public Task<List<Board>> GetAllBoardsAsync()
+		public Task<List<Game>> GetAllGamesAsync()
 		{
 			return _boardsCollection.Find(new BsonDocument()).ToListAsync();
 		}
 
-		public Task<Board> GetBoardAsync(string id)
+		public Task<Game> GetGameAsync(string id)
 		{
 			return _boardsCollection.Find(g => g.Id == id).SingleAsync();
 		}
 
-		public async Task SaveBoardAsync(Board board)
+		public async Task SaveGameAsync(Game board)
 		{
 			var isUpsert = false;
 

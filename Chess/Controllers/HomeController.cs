@@ -10,9 +10,9 @@ namespace Chess.Controllers
 {
     public class HomeController : Controller
     {
-		private IBoardRepository _gameRepository;
+		private IGameRepository _gameRepository;
 
-		public HomeController(IBoardRepository gameRep)
+		public HomeController(IGameRepository gameRep)
 		{
 			_gameRepository = gameRep;
 		}

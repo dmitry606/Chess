@@ -72,6 +72,8 @@
     <Compile Include="Engine\GameProcessorTests.cs" />
     <Compile Include="Engine\PieceFactoryTests.cs" />
     <Compile Include="Engine\PieceTests.cs" />
+    <Compile Include="GameFactory.cs" />
+    <Compile Include="Models\GameTests.cs" />
     <Compile Include="UnitTestUtil.cs" />
     <Compile Include="Repositories\MongoRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

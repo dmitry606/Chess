@@ -16,11 +16,6 @@ namespace Chess.Engine
 		private Player _white;
 		private Player _black;
 
-		public string Id { get; set; }
-		public string Caption { get; set; }
-		public DateTime CreatedAt { get; set; }
-		public DateTime LastModifiedAt { get; set; }
-
 		public List<HistoryEntry> History { get; set; }
 
 		public Player White
@@ -115,11 +110,6 @@ namespace Chess.Engine
 				return true;
 
 			return
-				Equals(Id, other.Id) &&
-				Equals(Caption, other.Caption) &&
-				CreatedAt.ToString() == other.CreatedAt.ToString() &&
-				LastModifiedAt.ToString() == other.LastModifiedAt.ToString() &&
-
 				Equals(White, other.White) &&
 				Equals(Black, other.Black) &&
 
@@ -130,10 +120,6 @@ namespace Chess.Engine
 		public override int GetHashCode()
 		{
 			int hash = 19;
-			hash = hash * 31 + Id?.GetHashCode() ?? 0;
-			hash = hash * 31 + CreatedAt.GetHashCode();
-			hash = hash * 31 + LastModifiedAt.GetHashCode();
-			hash = hash * 31 + Caption?.GetHashCode() ?? 0;
             hash = hash * 31 + White.GetHashCode();
 			hash = hash * 31 + Black.GetHashCode();
 			hash = hash * 31 + History.SequenceGetHashCode();
@@ -151,10 +137,6 @@ namespace Chess.Engine
 		{
 			var clone = new Board
 			{
-				Id = Id,
-				Caption = Caption,
-				CreatedAt = CreatedAt,
-				LastModifiedAt = LastModifiedAt,
 				History = new List<HistoryEntry>(History),
 			};
 

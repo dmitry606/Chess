@@ -7,12 +7,12 @@ namespace Chess.Engine
 {
 	public class Player : ICloneable
 	{
-		public string Name { get; set; }
 		public List<string> PieceStrings { get; set; } = new List<string>();
 		public Board Board { get; set; }
 
 		public Color Color => Board.White == this ? Color.White : Color.Black;
 		public Player Opponent => Board.White == this ? Board.Black : Board.White;
+
 		internal List<Piece> Pieces => PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
 
 		public void MakeMove(string from, string to, char? promotionTarget = null)
@@ -56,7 +56,7 @@ namespace Chess.Engine
 			if (ReferenceEquals(this, other))
 				return true;
 
-			return Equals(Name, other.Name) && PieceStrings.SequenceEqual(other.PieceStrings);
+			return PieceStrings.SequenceEqual(other.PieceStrings);
 		}
 		public override bool Equals(object obj) => Equals(obj as Player);
 
@@ -64,7 +64,6 @@ namespace Chess.Engine
 		{
 			int hash = 19;
 			hash = hash * 31 + PieceStrings.SequenceGetHashCode();
-			hash = hash * 31 + Name?.GetHashCode() ?? 0;
 			return hash;
 		}
 
@@ -77,7 +76,6 @@ namespace Chess.Engine
 		{
 			return new Player
 			{
-				Name = this.Name,
 				PieceStrings = new List<string>(this.PieceStrings)
 			};
 		}

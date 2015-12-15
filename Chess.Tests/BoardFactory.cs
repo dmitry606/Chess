@@ -13,11 +13,8 @@ namespace Chess.Tests
 		{
 			return new Board
 			{
-				Caption = "Initial test board",
-
 				White = new Player
 				{
-					Name = "White player",
 					PieceStrings = new List<string>
 					{
 						"pa2", "pb2", "pc2", "pd2", "pe2", "pf2", "pg2", "ph2",
@@ -27,7 +24,6 @@ namespace Chess.Tests
 
 				Black = new Player
 				{
-					Name = "Black player",
 					PieceStrings = new List<string>
 					{
 						"pa7", "pb7", "pc7", "pd7", "pe7", "pf7", "pg7", "ph7",
@@ -41,11 +37,8 @@ namespace Chess.Tests
 		{
 			return new Board
 			{
-				Caption = "Awesome game",
-
 				White = new Player
 				{
-					Name = "Vasya",
 					PieceStrings = new List<string>
 					{
 						"Qe1", "Nd5", "pe4", "pb2"
@@ -54,7 +47,6 @@ namespace Chess.Tests
 
 				Black = new Player
 				{
-					Name = "Petya",
 					PieceStrings = new List<string>
 					{
 						"Ka2", "Rf4", "pd5"
@@ -74,12 +66,8 @@ namespace Chess.Tests
 		{
 			return new Board
 			{
-				//CreatedAt = new DateTime(2014, 9, 9),
-				Caption = "Not so awesome game",
-
 				White = new Player
 				{
-					Name = "Jenya",
 					PieceStrings = new List<string>
 					{
 						"pa1", "pa2", "Ke6"
@@ -88,7 +76,6 @@ namespace Chess.Tests
 
 				Black = new Player
 				{
-					Name = "Vitya",
 					PieceStrings = new List<string>
 					{
 						"Kd7", "Ba4"
@@ -112,6 +99,5 @@ namespace Chess.Tests
 
 			return board;
 		}
-
 	}
 }

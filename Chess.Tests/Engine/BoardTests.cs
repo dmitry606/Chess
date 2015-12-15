@@ -157,30 +157,13 @@ namespace Chess.Engine.Tests
 			var board2 = new Board();
 			Assert.AreEqual(board1, board2);
 			Assert.AreEqual(board1.GetHashCode(), board2.GetHashCode());
+			Assert.AreNotEqual(board1, null);
 
 			board1 = BoardFactory.ConstructSomeBoard();
 			board2 = BoardFactory.ConstructSomeBoard();
 			Assert.AreEqual(board1, board2);
 			Assert.AreEqual(board1.GetHashCode(), board2.GetHashCode());
-			Assert.AreEqual(board2, board1);
-			Assert.AreEqual(board2.GetHashCode(), board1.GetHashCode());
 
-			board2 = BoardFactory.ConstructSomeBoard();
-			board2.Caption = "diff";
-			Assert.AreNotEqual(board1, board2);
-			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
-
-			board2 = BoardFactory.ConstructSomeBoard();
-			board2.CreatedAt = board2.CreatedAt.AddDays(1);
-            Assert.AreNotEqual(board1, board2);
-			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
-
-			board2 = BoardFactory.ConstructSomeBoard();
-			board2.CreatedAt = board2.LastModifiedAt.AddHours(1);
-			Assert.AreNotEqual(board1, board2);
-			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
-
-			board2 = BoardFactory.ConstructSomeBoard();
 			board2.History.Add(new HistoryEntry("Rg1", "d1", MoveType.Capture) { ResultingEvent = GameEvent.Checkmate });
 			Assert.AreNotEqual(board1, board2);
 			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
@@ -188,11 +171,6 @@ namespace Chess.Engine.Tests
 			board2 = BoardFactory.ConstructSomeBoard();
 			board2.White.PieceStrings.Add("Qe1");
 			Assert.AreNotEqual(board1, board2);
-			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
-
-			board2 = BoardFactory.ConstructSomeBoard();
-			board2.Black.Name = board2.Black.Name + "diff";
-            Assert.AreNotEqual(board1, board2);
 			Assert.AreNotEqual(board1.GetHashCode(), board2.GetHashCode());
 		}
 	}

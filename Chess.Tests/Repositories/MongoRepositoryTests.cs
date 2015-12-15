@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Chess.Models;
 using Chess.Engine;
 using Chess.Tests;
 
@@ -21,7 +22,7 @@ namespace Chess.Repositories.Concrete.Tests
 		[ClassInitialize()]
 		public static void ClassInit(TestContext context)
 		{
-			var connectionString = ConfigurationManager.ConnectionStrings[MongoBoardRepository.CONNECTION_STRING_NAME].ConnectionString;
+			var connectionString = ConfigurationManager.ConnectionStrings[MongoGameRepository.CONNECTION_STRING_NAME].ConnectionString;
 			var client = new MongoClient(connectionString);
 			client.DropDatabaseAsync(DATABASE_NAME).Wait();
 
@@ -31,7 +32,7 @@ namespace Chess.Repositories.Concrete.Tests
 		[TestInitialize]
 		public void TestInit()
 		{
-			GetDatabase().DropCollectionAsync(MongoBoardRepository.GAMES_COLLECTION_NAME).Wait();
+			GetDatabase().DropCollectionAsync(MongoGameRepository.GAMES_COLLECTION_NAME).Wait();
 		}
 
 		[TestMethod()]
@@ -45,10 +46,10 @@ namespace Chess.Repositories.Concrete.Tests
 		public void New_board_can_be_saved_one()
 		{
 			var rep = GetRepository();
-			var board = new Board();
+			var board = new Game { Board = new Board() };
 			Assert.AreEqual(board.Id, null);
 
-			rep.SaveBoardAsync(board).Wait();
+			rep.SaveGameAsync(board).Wait();
 
 			Assert.IsFalse(string.IsNullOrEmpty(board.Id));
 			Assert.IsTrue(Exists(board.Id));
@@ -58,9 +59,9 @@ namespace Chess.Repositories.Concrete.Tests
 		public void New_board_can_be_saved_multiple()
 		{
 			var rep = GetRepository();
-			var boards = Enumerable.Range(0, 20).Select(i => new Board()).ToList();
+			var boards = Enumerable.Range(0, 20).Select(i => new Game { Board = new Board() }).ToList();
 
-			var tasks = boards.Select(g => rep.SaveBoardAsync(g)).ToArray();
+			var tasks = boards.Select(g => rep.SaveGameAsync(g)).ToArray();
 			Task.WaitAll(tasks);
 
 			Assert.IsTrue(boards.All(g => !string.IsNullOrEmpty(g.Id)));
@@ -73,11 +74,11 @@ namespace Chess.Repositories.Concrete.Tests
 		public void Board_with_non_existent_id_is_not_saved()
 		{
 			var rep = GetRepository();
-			var board = BoardFactory.ConstructSomeBoard();
+			var board = GameFactory.ConstructSomeBoard();
 			board.Id = ObjectId.GenerateNewId().ToString();
 
 			UnpackAggregateExceptionSingle(
-				delegate { rep.SaveBoardAsync(board).Wait(); }
+				delegate { rep.SaveGameAsync(board).Wait(); }
 			);
 
 			Assert.Fail();
@@ -87,10 +88,10 @@ namespace Chess.Repositories.Concrete.Tests
 		public void Board_can_be_saved_and_read_correctly()
 		{
 			var rep = GetRepository();
-			var original = BoardFactory.ConstructSomeBoard();
+			var original = GameFactory.ConstructSomeBoard();
 
-			rep.SaveBoardAsync(original).Wait();
-			var retrieved = rep.GetBoardAsync(original.Id).GetAwaiter().GetResult();
+			rep.SaveGameAsync(original).Wait();
+			var retrieved = rep.GetGameAsync(original.Id).GetAwaiter().GetResult();
 
 			Assert.IsFalse(ReferenceEquals(original, retrieved));
 			Assert.AreEqual(original, retrieved);
@@ -100,32 +101,32 @@ namespace Chess.Repositories.Concrete.Tests
 		public void Board_can_be_changed()
 		{
 			var rep = GetRepository();
-			var original = BoardFactory.ConstructSomeBoard();
+			var original = GameFactory.ConstructSomeBoard();
 
-			rep.SaveBoardAsync(original).Wait();
-			var retrieved = rep.GetBoardAsync(original.Id).GetAwaiter().GetResult();
+			rep.SaveGameAsync(original).Wait();
+			var retrieved = rep.GetGameAsync(original.Id).GetAwaiter().GetResult();
 
 			var addedEntry = new HistoryEntry("Ka1", "b1", MoveType.Regular);
-            retrieved.History.Add(addedEntry);
-            rep.SaveBoardAsync(retrieved).Wait();
+            retrieved.Board.History.Add(addedEntry);
+            rep.SaveGameAsync(retrieved).Wait();
 
-			var actual = rep.GetBoardAsync(original.Id).GetAwaiter().GetResult();
-			var expectedHistory = original.History.ToList();
+			var actual = rep.GetGameAsync(original.Id).GetAwaiter().GetResult();
+			var expectedHistory = original.Board.History.ToList();
 			expectedHistory.Add(addedEntry);
-			Assert.IsTrue(expectedHistory.SequenceEqual(actual.History));
+			Assert.IsTrue(expectedHistory.SequenceEqual(actual.Board.History));
 		}
 
 		[TestMethod]
 		public void GetAll_works()
 		{
 			var rep = GetRepository();
-			var boards = Enumerable.Range(0, 20).Select(i => BoardFactory.ConstructSomeBoard()).ToList();
+			var boards = Enumerable.Range(0, 20).Select(i => GameFactory.ConstructSomeBoard()).ToList();
 
-			var tasks = boards.Select(g => rep.SaveBoardAsync(g)).ToArray();
+			var tasks = boards.Select(g => rep.SaveGameAsync(g)).ToArray();
 			Task.WaitAll(tasks);
-			var actual = rep.GetAllBoardsAsync().GetAwaiter().GetResult();
+			var actual = rep.GetAllGamesAsync().GetAwaiter().GetResult();
 
-			Comparison<Board> comp = (a, b) => a.Id.CompareTo(b.Id);
+			Comparison<Game> comp = (a, b) => a.Id.CompareTo(b.Id);
 			boards.Sort(comp);
 			actual.Sort(comp);
 			Assert.IsTrue(boards.SequenceEqual(actual));
@@ -133,14 +134,14 @@ namespace Chess.Repositories.Concrete.Tests
 
 		private IMongoDatabase GetDatabase()
 		{
-			var connectionString = ConfigurationManager.ConnectionStrings[MongoBoardRepository.CONNECTION_STRING_NAME].ConnectionString;
+			var connectionString = ConfigurationManager.ConnectionStrings[MongoGameRepository.CONNECTION_STRING_NAME].ConnectionString;
 			var client = new MongoClient(connectionString);
 			return client.GetDatabase(DATABASE_NAME);
 		}
 
 		private IMongoCollection<BsonDocument> GetboardsCollection()
 		{
-			return GetDatabase().GetCollection<BsonDocument>(MongoBoardRepository.GAMES_COLLECTION_NAME);
+			return GetDatabase().GetCollection<BsonDocument>(MongoGameRepository.GAMES_COLLECTION_NAME);
         }
 
 		private bool Exists(string boardId)
@@ -173,9 +174,9 @@ namespace Chess.Repositories.Concrete.Tests
 		}
 
 
-		private IBoardRepository GetRepository()
+		private IGameRepository GetRepository()
 		{
-			return new MongoBoardRepository(DATABASE_NAME);
+			return new MongoGameRepository(DATABASE_NAME);
 		}
 
 		private void UnpackAggregateExceptionSingle(Action action)

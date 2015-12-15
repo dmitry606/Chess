@@ -1,4 +1,5 @@
-﻿using Chess.Engine;
+﻿using Chess.Models;
+using Chess.Engine;
 using Chess.Repositories;
 using System;
 using System.Collections.Generic;
@@ -24,17 +25,17 @@ namespace Chess.Controllers
 
 	public class BoardController : ApiController
     {
-		private readonly IBoardRepository _repository;
-		private readonly GameState _game;
+		private readonly IGameRepository _repository;
+		private readonly GameState _gameStatus;
 
 		public BoardController()
 		{
 		}
 
-		public BoardController(IBoardRepository repo, GameState game)
+		public BoardController(IGameRepository repo, GameState game)
 		{
 			_repository = repo;
-			_game = game;
+			_gameStatus = game;
 		}
 			
 		[HttpGet]
@@ -45,26 +46,26 @@ namespace Chess.Controllers
 		}
 
 		[HttpPut]
-		public async Task<Board> MakeMove(string from, string to, char? promotionTarget = null)
+		public async Task<Game> MakeMove(string from, string to, char? promotionTarget = null)
 		{
-			var board = await _repository.GetBoardAsync(_game.BoardId);
-			board[_game.CurrentPlayerColor].MakeMove(from, to, promotionTarget);
-			await _repository.SaveBoardAsync(board);
-			return board;
+			var game = await _repository.GetGameAsync(_gameStatus.BoardId);
+			game.Board[_gameStatus.CurrentPlayerColor].MakeMove(from, to, promotionTarget);
+			await _repository.SaveGameAsync(game);
+			return game;
 		}
 
 		[HttpGet]
 		public async Task<IEnumerable<MoveOption>> GetLegalMoves(string position)
 		{
-			var board = await _repository.GetBoardAsync(_game.BoardId);
-			return board[_game.CurrentPlayerColor].GetLegalMoves(position);
+			var game = await _repository.GetGameAsync(_gameStatus.BoardId);
+			return game.Board[_gameStatus.CurrentPlayerColor].GetLegalMoves(position);
         }
 
 		[HttpGet]
 		public async Task<HistoryEntry> GetLastMove()
 		{
-			var board = await _repository.GetBoardAsync(_game.BoardId);
-			return board.PeekHistory();
+			var game = await _repository.GetGameAsync(_gameStatus.BoardId);
+			return game.Board.PeekHistory();
 		}
     }
 }
