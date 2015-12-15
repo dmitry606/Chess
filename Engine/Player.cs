@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Chess.Utils;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
 	public class Player : ICloneable
 	{
@@ -14,7 +13,7 @@ namespace Chess.Models
 
 		public Color Color => Board.White == this ? Color.White : Color.Black;
 		public Player Opponent => Board.White == this ? Board.Black : Board.White;
-		public List<Piece> Pieces => PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
+		internal List<Piece> Pieces => PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
 
 		public void MakeMove(string from, string to, char? promotionTarget = null)
 		{

@@ -8,13 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using Chess.Models;
+using Chess.Engine;
 using Chess.Tests;
 
 namespace Chess.Repositories.Concrete.Tests
 {
 	[TestClass()]
-	public class MongoboardRepositoryTests
+	public class MongoRepositoryTests
 	{
 		private const string DATABASE_NAME = "Chess_unit_testing";
 

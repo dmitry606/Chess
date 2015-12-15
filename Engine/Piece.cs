@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
-	public abstract class Piece
+	internal abstract class Piece
 	{
 		public const char King = 'K';
 		public const char Queen = 'Q';
@@ -67,7 +67,7 @@ namespace Chess.Models
 		public override string ToString() => PieceString;
 	}
 
-	public class Bishop : Piece
+	internal class Bishop : Piece
 	{
 		public override char CharType => Bishop;
 
@@ -89,7 +89,7 @@ namespace Chess.Models
 		}
 	}
 
-	public class Rook : Piece
+	internal class Rook : Piece
 	{
 		public override char CharType => Rook;
 
@@ -111,7 +111,7 @@ namespace Chess.Models
 		}
 	}
 
-	public class Queen : Piece
+	internal class Queen : Piece
 	{
 		public override char CharType => Queen;
 
@@ -138,7 +138,7 @@ namespace Chess.Models
 		}
 	}
 
-	public class King : Piece
+	internal class King : Piece
 	{
 		public override char CharType => King;
 
@@ -216,7 +216,7 @@ namespace Chess.Models
 		}
 	}
 
-	public class Knight : Piece
+	internal class Knight : Piece
 	{
 		public override char CharType => Knight;
 
@@ -243,12 +243,10 @@ namespace Chess.Models
 		}
 	}
 
-	public class Pawn : Piece
+	internal class Pawn : Piece
 	{
 		public override char CharType => Pawn;
 
-		//private int _enpassantRow;
-		//private int _promotionRow;
 		private bool _atPromotion;
 		private bool _atEnpassant;
 		private bool _atInitial;

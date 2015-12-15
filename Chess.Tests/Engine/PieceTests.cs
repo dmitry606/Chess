@@ -1,4 +1,4 @@
-﻿using Chess.Models;
+﻿using Chess.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;

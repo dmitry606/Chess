@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Chess.Models;
+using Chess.Engine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Chess.Tests;
 
-namespace Chess.Models.Tests
+namespace Chess.Engine.Tests
 {
 	[TestClass()]
 	public class GameProcessorTests

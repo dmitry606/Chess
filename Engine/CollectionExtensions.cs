@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Chess.Utils
+namespace Chess.Engine
 {
-	public static class CollectionExtensions
+	internal static class CollectionExtensions
 	{
 		public static int SequenceGetHashCode<T>(this IEnumerable<T> coll)
 		{

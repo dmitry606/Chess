@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
-	public static class ChessUtil
+	internal static class ChessUtil
 	{
 		public static char ExtractCharType(string pieceString) => pieceString[0];
 		public static string ExtractPosition(string pieceString) => pieceString.Substring(1, 2);

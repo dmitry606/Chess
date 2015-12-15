@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Chess.Utils;
-using Newtonsoft.Json;
-using MongoDB.Bson.Serialization.Attributes;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
 	public enum Color
 	{
@@ -57,9 +54,6 @@ namespace Chess.Models
 
 		public Player this[Color playerColor] => playerColor == Color.White ? White : Black;
 
-		public CellHandle this[string position] => GetCellHandle(position, null);
-		public CellHandle this[Piece piece] => GetCellHandle(piece.PieceString, piece.Color);
-
 		public Board()
 		{
 			White = new Player();
@@ -67,7 +61,10 @@ namespace Chess.Models
 			History = new List<HistoryEntry>();
 		}
 
-		public BoardMatrix GetMatrix()
+		internal CellHandle this[string position] => GetCellHandle(position, null);
+		internal CellHandle this[Piece piece] => GetCellHandle(piece.PieceString, piece.Color);
+
+		internal BoardMatrix GetMatrix()
 		{
 			Color?[,] matrix = new Color?[8, 8];
 			foreach (var ps in White.PieceStrings)
@@ -199,7 +196,7 @@ namespace Chess.Models
 		}
 
 
-		public class CellHandle
+		internal class CellHandle
 		{
 			public string PieceString { get; }
 			public Color Color { get; }

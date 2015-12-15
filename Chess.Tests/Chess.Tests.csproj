@@ -66,21 +66,24 @@
   <ItemGroup>
     <Compile Include="BoardFactory.cs" />
     <Compile Include="BoardMatrixFactory.cs" />
-    <Compile Include="Models\BoardMatrixTests.cs" />
-    <Compile Include="Models\BoardTests.cs" />
-    <Compile Include="Models\ChessUtilTests.cs" />
-    <Compile Include="Models\GameProcessorTests.cs" />
-    <Compile Include="Models\PieceFactoryTests.cs" />
-    <Compile Include="Models\PieceTests.cs" />
+    <Compile Include="Engine\BoardMatrixTests.cs" />
+    <Compile Include="Engine\BoardTests.cs" />
+    <Compile Include="Engine\ChessUtilTests.cs" />
+    <Compile Include="Engine\GameProcessorTests.cs" />
+    <Compile Include="Engine\PieceFactoryTests.cs" />
+    <Compile Include="Engine\PieceTests.cs" />
     <Compile Include="UnitTestUtil.cs" />
-    <Compile Include="Repositories\MongoBoardRepositoryTests.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="Repositories\MongoRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chess\Chess.csproj">
       <Project>{F018BD3C-2C7B-4D8D-8A99-CD840D03376A}</Project>
       <Name>Chess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Engine\Engine.csproj">
+      <Project>{e474f7e2-8b8f-4b67-84dd-1ee29fea6ab9}</Project>
+      <Name>Engine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
-	public class GameProcessor
+	internal class GameProcessor
 	{
 		public Board SourceBoard { get; }
 

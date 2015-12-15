@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chess.Models;
+using Chess.Engine;
 
 namespace Chess.Tests
 {
-	public static class BoardMatrixFactory
+	internal static class BoardMatrixFactory
 	{
 		private const Color B = Color.Black;
 		private const Color W = Color.White;

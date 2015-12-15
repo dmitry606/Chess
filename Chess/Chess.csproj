@@ -158,18 +158,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Board.cs" />
-    <Compile Include="Models\BoardMatrix.cs" />
-    <Compile Include="Models\ChessUtil.cs" />
-    <Compile Include="Models\GameProcessor.cs" />
-    <Compile Include="Models\MoveType.cs" />
-    <Compile Include="Models\Piece.cs" />
-    <Compile Include="Models\PieceFactory.cs" />
-    <Compile Include="Models\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Concrete\MongoBoardRepository.cs" />
     <Compile Include="Repositories\IBoardRepository.cs" />
-    <Compile Include="Utils\CollectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
@@ -191,6 +182,13 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Domain\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj">
+      <Project>{e474f7e2-8b8f-4b67-84dd-1ee29fea6ab9}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

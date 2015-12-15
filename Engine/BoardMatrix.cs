@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
-	public class BoardMatrix
+	internal class BoardMatrix
 	{
 		public const string ColumnString = "abcdefgh";
 

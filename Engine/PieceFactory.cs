@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Chess.Models
+namespace Chess.Engine
 {
-	public static class PieceFactory
+	internal static class PieceFactory
 	{
 		public static Piece Create(Color color, string pieceString)
 		{
