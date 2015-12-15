@@ -15,8 +15,8 @@ namespace Chess.Repositories.Concrete
 	{
 		public const string CONNECTION_STRING_NAME = "Chess";
 		public const string DEFAULT_DATABASE_NAME = "chess";
-		public const string GAMES_COLLECTION_NAME = "boards";
-		public const string COUNTERS_COLLECTION_NAME = "counters";
+		public const string GAMES_COLLECTION_NAME = "games";
+		//public const string COUNTERS_COLLECTION_NAME = "counters";
 
 		private readonly IMongoClient _client;
 		private readonly IMongoDatabase _database;

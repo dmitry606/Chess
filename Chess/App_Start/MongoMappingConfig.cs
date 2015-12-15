@@ -5,10 +5,11 @@ using System.Web;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
-using Chess.Engine;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Conventions;
+using Chess.Engine;
+using Chess.Models;
 
 namespace Chess.App_Start
 {
@@ -16,7 +17,7 @@ namespace Chess.App_Start
 	{
 		public static void MapClasses()
 		{
-			BsonClassMap.RegisterClassMap<Board>(cm =>
+			BsonClassMap.RegisterClassMap<Game>(cm =>
 			{
 				cm.AutoMap();
 				cm.IdMemberMap.SetSerializer(new StringSerializer(BsonType.ObjectId));
