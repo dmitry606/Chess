@@ -13,7 +13,8 @@ namespace Chess.Engine
 		public Color Color => Board.White == this ? Color.White : Color.Black;
 		public Player Opponent => Board.White == this ? Board.Black : Board.White;
 
-		internal List<Piece> Pieces => PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
+		internal List<Piece> GetPieces() => 
+			PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
 
 		public void MakeMove(string from, string to, char? promotionTarget = null)
 		{

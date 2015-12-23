@@ -81,6 +81,10 @@ namespace Chess.Engine
 		public SecondaryMoveType? Secondary { get; set; }
 		public string SpecialCapturePosition { get; set; }
 
+		public MoveOption()
+		{
+		}
+
 		public MoveOption(MoveType moveType, string dest)
 		{
 			if (dest == null || dest.Length != 2)

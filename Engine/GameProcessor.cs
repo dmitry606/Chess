@@ -98,7 +98,7 @@ namespace Chess.Engine
 			var color = SourceBoard.GetLastMovePlayerColor().Invert();
 
 			var hasMoves = false;
-			foreach (var piece in SourceBoard[color].Pieces)
+			foreach (var piece in SourceBoard[color].GetPieces())
 			{
 				var moves = FilterOptions(piece, piece.GetTechnicalMoves(SourceBoard.GetMatrix()));
 				if (moves.Any())
@@ -152,7 +152,7 @@ namespace Chess.Engine
 		private static bool IsUnderAttack(Board board, string position, Color fromColor)
 		{
 			var matrix = board.GetMatrix();
-			return board[fromColor].Pieces
+			return board[fromColor].GetPieces()
 				.SelectMany(p => p.GetTechnicalMoves(matrix))
 				.Any(m => m.Destination == position || m.SpecialCapturePosition == position);
 		}
