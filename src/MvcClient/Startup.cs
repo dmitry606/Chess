@@ -14,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNet.Diagnostics;
 using Newtonsoft.Json.Serialization;
 using Chess.Tests.Models;
+using Microsoft.Extensions.Logging.Console.Internal;
+using Chess.MvcClient.Infrastructure;
 
 namespace MvcClient
 {
@@ -26,11 +28,9 @@ namespace MvcClient
 				.AddJsonFile("appsettings.json")
 				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
-			if (env.IsDevelopment())
-			{
-				// For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-				//builder.AddUserSecrets();
-			}
+			var console = new WindowsLogConsole();
+			console.WriteLine("Hello", null, null);
+
 
 			builder.AddEnvironmentVariables();
 			Configuration = builder.Build();
@@ -42,60 +42,57 @@ namespace MvcClient
 		// For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
         {
-			services.AddTransient<IGameRepository>(s => new MongoGameRepository(
-				Configuration["Data:MongoDB:ConnectionString"],
-				Configuration["Data:MongoDB:DatabaseName"]));
-
+			//services.AddTransient<IGameRepository>(s => new MongoGameRepository(
+			//	Configuration["Data:MongoDB:ConnectionString"],
+			//	Configuration["Data:MongoDB:DatabaseName"]));
+			services.AddSingleton<IGameRepository>(s => new InMemoryRepository());
 
 			services
 				.AddMvc()
-				.AddJsonOptions(options => {
+				.AddJsonOptions(options =>
+				{
 					options.SerializerSettings.ReferenceLoopHandling =
 						Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 					options.SerializerSettings.ContractResolver = new WritablePropertiesOnlyResolver();
 				});
-
 		}
+
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
-			loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-			loggerFactory.AddDebug();
-			//loggerFactory.AddConsole(minLevel: LogLevel.Verbose);
-			
+			var logSection = Configuration.GetSection("Logging");
+			loggerFactory.AddConsole(logSection);
+			loggerFactory.AddFileDestination(logSection);
+
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
 				app.UseRuntimeInfoPage(); // default path is /runtimeinfo
 			}
 
-
 			MongoMappingConfig.Configure();
-
             app.UseIISPlatformHandler();
-
 			app.UseStaticFiles();
-
-			app.UseMvc();
-
-			app.UseExceptionHandler(errorApp =>
+			app.UseMvc(routes =>
 			{
-				errorApp.Run(context =>
-				{
-					throw new NotImplementedException();
-				});
+				var endpoint = new { controller = "Home", action = "Index" };
+				routes.MapRoute("home", "", endpoint);
+				routes.MapRoute("game", "game/{id?}", endpoint);
 			});
-
 			app.Run(async (context) =>
 			{
 				var logger = loggerFactory.CreateLogger("Catchall Endpoint");
-				logger.LogInformation("No endpoint found for request {path}", context.Request.Path);
-				await context.Response.WriteAsync("No endpoint found!");
+				var message = $"No endpoint found for request '{context.Request.Path}'"; 
+				logger.LogInformation(message);
+				await context.Response.WriteAsync(message);
 			});
 		}
 
-        // Entry point for the application.
-        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
+		// Entry point for the application.
+		public static void Main(string[] args)
+		{
+			WebApplication.Run<Startup>(args);
+		}
     }
 }

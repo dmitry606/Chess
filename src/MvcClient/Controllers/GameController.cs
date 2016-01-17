@@ -6,39 +6,46 @@ using Microsoft.AspNet.Mvc;
 using Chess.Models;
 using Chess.Engine;
 using Chess.Repositories;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Chess.MvcClient.Controllers
 {
     [Route("api/[controller]")]
-    public class GamesController : Controller
+    public class GameController : Controller
     {
 		private readonly IGameRepository _repository;
+		private readonly ILogger<GameController> _logger;
 
-		public GamesController(IGameRepository repository)
+		public GameController(IGameRepository repository, ILogger<GameController> logger)
 		{
 			_repository = repository;
+			_logger = logger;
 		}
 
 		// GET api/values/5
-		//[HttpGet("{id}")]
-		//public async Task<Game> Get(string id)
-		//{
-		//	return await _repository.GetGameAsync(id);
-		//}
+		[HttpGet("{id}")]
+		public async Task<Game> Get(string id)
+		{
+			return await _repository.GetGameAsync(id);
+		}
 
-		[HttpGet()]
+		[HttpGet("new")]
 		public async Task<Game> New()
 		{
-			return new Game
+			_logger.LogInformation("New!!");
+			var game = new Game
 			{
-				Id = null,
 				Caption = "New game",
 				BlackName = "Black player",
-				WhiteName = "White player",
+				WhiteName = "White player_",
 				Board = Board.ConstructInitialBoard(),
 			};
+			//CreatedAtRoute()
+			await _repository.SaveGameAsync(game);
+
+			return game;
 		}
 
 

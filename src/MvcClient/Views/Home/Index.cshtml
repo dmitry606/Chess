@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>SimplyChess - Home</title>
+	<link rel="stylesheet" href="css/site.css">
+	<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css">
+</head>
+<body ng-app="app">	
+	<section>
+		<div class="container">
+			<div ng-view></div>
+		</div>
+	</section>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+	<script src="lib/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="lib/angular/angular.js"></script>
+	<script src="lib/angular-route/angular-route.js"></script>
+
+	<script src="scripts/app.module.js"></script>
+	<script src="scripts/gamesService.js"></script>
+	<script src="scripts/game.controller.js"></script>
+	<script src="scripts/start.controller.js"></script>
+</body>
+</html>
