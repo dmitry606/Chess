@@ -7,6 +7,7 @@ using Chess.Models;
 using Chess.Engine;
 using Chess.Repositories;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNet.Hosting;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,28 +27,37 @@ namespace Chess.MvcClient.Controllers
 
 		// GET api/values/5
 		[HttpGet("{id}")]
-		public async Task<Game> Get(string id)
+		public async Task<IActionResult> Get(string id)
 		{
-			return await _repository.GetGameAsync(id);
+			var game = await _repository.GetGameAsync(id);
+
+			if (null == game)
+			{
+				return HttpNotFound();
+			}
+
+			return new ObjectResult(game);
 		}
 
 		[HttpGet("new")]
-		public async Task<Game> New()
+		public async Task<IActionResult> New()
 		{
-			_logger.LogInformation("New!!");
-			var game = new Game
+			var game = CreateNewGame();
+			await _repository.SaveGameAsync(game);
+
+			return new ObjectResult(game);
+		}
+
+		private static Game CreateNewGame()
+		{
+			return new Game
 			{
 				Caption = "New game",
 				BlackName = "Black player",
-				WhiteName = "White player_",
+				WhiteName = "White player",
 				Board = Board.ConstructInitialBoard(),
 			};
-			//CreatedAtRoute()
-			await _repository.SaveGameAsync(game);
-
-			return game;
 		}
-
 
 		// GET: api/values
 		//[HttpGet]

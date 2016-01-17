@@ -19,7 +19,9 @@ namespace Chess.MvcClient.Repositories.Concrete
 
 		public async Task<Game> GetGameAsync(string id)
 		{
-			return _data[id];
+			Game game;
+			_data.TryGetValue(id, out game);
+			return game;
 		}
 
 		public async Task SaveGameAsync(Game game)
