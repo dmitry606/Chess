@@ -5,12 +5,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Chess.Models;
 using MongoDB.Bson;
+using Chess.Engine;
 
 namespace Chess.MvcClient.Repositories.Concrete
 {
 	public class InMemoryRepository : IGameRepository
 	{
-		private Dictionary<string, Game> _data = new Dictionary<string, Game>();
+		private Dictionary<string, Game> _data = new Dictionary<string, Game>
+		{
+			["606"] = new Game
+			{
+				Caption = "Classic",
+				BlackName = "Black player",
+				WhiteName = "White player",
+				Board = Board.ConstructInitialBoard(),
+			}
+		};
 
 		public async Task<List<Game>> GetAllGamesAsync()
 		{
