@@ -1,0 +1,14 @@
+<h3>{{ctrl.currentGame.Caption}}</h3>
+
+<table class='board' ng-click="playerName='changed in parent'">
+	<tr ng-repeat="rowValue in rows">
+		<td 
+			ng-repeat="colValue in columns" 
+			id="{{colValue + rowValue}}"
+			chess-piece ownerboard='board'
+			ng-click="ctrl.onCellClick($event)">
+		</td>	
+
+	</tr>
+</table>
+

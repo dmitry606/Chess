@@ -36,6 +36,9 @@ namespace Chess.Engine
 		public List<MoveOption> GetLegalMoves(string position)
 		{
 			var piece = FindPiece(position);
+			if (null == piece)
+				return null;
+
             var options = piece.GetTechnicalMoves(Board.GetMatrix());
 
 			return new GameProcessor(Board).FilterOptions(piece, options);
@@ -45,7 +48,10 @@ namespace Chess.Engine
 		{
 			var pieceString = PieceStrings.FirstOrDefault(s => s.EndsWith(position));
 			if (null == pieceString)
-				throw new ArgumentException($"No piece at '{position}'", nameof(position));
+			{
+				return null;
+			}
+				
 			return PieceFactory.Create(Color, pieceString);
 		}
 

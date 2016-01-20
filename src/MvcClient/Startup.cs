@@ -78,7 +78,8 @@ namespace MvcClient
 			{
 				var endpoint = new { controller = "Home", action = "Index" };
 				routes.MapRoute("home", "", endpoint);
-				routes.MapRoute("game", "game/{id?}", endpoint);
+				routes.MapRoute("game", "game/{id}", endpoint);
+				//routes.MapRoute("moves", "game/{id}/moves/{pos}", endpoint);
 			});
 			app.Run(async (context) =>
 			{

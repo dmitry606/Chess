@@ -1,5 +1,15 @@
 'use strict';
 
+function $(selector, container) {
+	return (container || document).querySelector(selector);
+}
+
+function $$(selector, container) {
+	var nodeList = (container || document).querySelectorAll(selector);
+	return Array.prototype.slice.call(nodeList);
+}
+
+
 (function () {
 	var app = angular.module('app', ['ngRoute']);
 

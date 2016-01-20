@@ -36,7 +36,7 @@ namespace Chess.Engine
 				throw new ArgumentException("Invalid promotion");
 			}
 
-			if (SourceBoard.GetLastMovePlayerColor() == piece.Color)
+			if (SourceBoard.PrevTurnColor == piece.Color)
 				throw new InvalidOperationException($"It's not {piece.Color} turn");
 
 			if (!IsAllowed(piece, move))
@@ -95,10 +95,8 @@ namespace Chess.Engine
 
 		private GameEvent? EvaluateGameState()
 		{
-			var color = SourceBoard.GetLastMovePlayerColor().Invert();
-
 			var hasMoves = false;
-			foreach (var piece in SourceBoard[color].GetPieces())
+			foreach (var piece in SourceBoard[SourceBoard.CurrentTurnColor].GetPieces())
 			{
 				var moves = FilterOptions(piece, piece.GetTechnicalMoves(SourceBoard.GetMatrix()));
 				if (moves.Any())
@@ -108,7 +106,7 @@ namespace Chess.Engine
 				}
 			}
 
-			return IsInCheck(SourceBoard, color) ?
+			return IsInCheck(SourceBoard, SourceBoard.CurrentTurnColor) ?
 				(hasMoves ? GameEvent.Check : GameEvent.Checkmate) :
 				(hasMoves ? (GameEvent?)null : GameEvent.Draw);
         }

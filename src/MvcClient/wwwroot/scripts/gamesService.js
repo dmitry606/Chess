@@ -34,10 +34,23 @@
 				onSuccess(getCurrent());
 			}
 
+			function getMoves(gameId, pos, onSuccess) {
+				$http.get('/api/game/' + gameId + '/pos=' + pos).success(onSuccess);
+			}
+
+			function makeMove(gameId, fromPos, toPos, onSuccess) {
+				$http.put('/api/game/' + gameId, { fromPos: fromPos, toPos: toPos }).success(function () {
+					_currentGame = null;
+					getGame(gameId, onSuccess);
+				});
+			}
+
 			return {
 				newGame: newGame,
 				getCurrent: getCurrent,
-				getGame: getGame
+				getGame: getGame,
+				getMoves: getMoves,
+				makeMove: makeMove
 			}
 		}])
 })();

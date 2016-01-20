@@ -32,9 +32,15 @@ namespace Chess.MvcClient.Controllers
         {
         }
 
+		public class ValuePutParams
+		{
+			public string val1 { get; set; }
+			public string val2 { get; set; }
+		}
+
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody]ValuePutParams value)
         {
         }
 

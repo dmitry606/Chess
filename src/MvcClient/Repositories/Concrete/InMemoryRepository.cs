@@ -11,16 +11,16 @@ namespace Chess.MvcClient.Repositories.Concrete
 {
 	public class InMemoryRepository : IGameRepository
 	{
-		private Dictionary<string, Game> _data = new Dictionary<string, Game>
-		{
-			["606"] = new Game
+		private static Dictionary<string, Game> _data = Enumerable.Range(606, 656)
+			.Select(id => new Game
 			{
-				Caption = "Classic",
+				Id = id.ToString(),
+				Caption = $"Test game #{id}",
 				BlackName = "Black player",
 				WhiteName = "White player",
-				Board = Board.ConstructInitialBoard(),
-			}
-		};
+				Board = Board.ConstructInitialBoard()
+			})
+			.ToDictionary(g => g.Id);
 
 		public async Task<List<Game>> GetAllGamesAsync()
 		{

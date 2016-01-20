@@ -1,0 +1,55 @@
+body {
+}
+
+header {
+	background-image: linear-gradient(#04519c, #044689 50%, #033770);
+	color:#fff;
+	min-height:50px;
+}
+
+section {
+}
+
+
+.board {
+	border:3px solid #ccc; 
+}
+
+	.board td {
+		background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
+		box-shadow:inset 0 0 0 1px #fff;
+		text-align:center;
+		vertical-align:middle;		
+		height: 70px;
+		width: 70px;
+	}
+	
+	.board tr:nth-child(odd) td:nth-child(even),
+	.board tr:nth-child(even) td:nth-child(odd) {
+		background:-webkit-gradient(linear,0 0, 0 100%, from(#ccc), to(#eee));
+		box-shadow:inset 0 0 10px rgba(0,0,0,.4);
+	}
+
+	.board td:hover {
+		box-shadow:inset 0 0 15px rgba(68, 50, 50, 0.90) !important;
+	}
+
+		.board td img {
+			
+		}
+
+
+.cell_selected {
+	background: lightblue !important;
+}
+
+.cell_allowed_move {
+	background: lightgreen !important;
+}
+
+.cell_allowed_capture {
+	background: lightgreen !important;
+	box-shadow:inset 0 0 25px rgb(250, 0, 0) !important;
+}
+
+

@@ -86,10 +86,9 @@ namespace Chess.Engine
 			return History.LastOrDefault();
 		}
 
-		public Color GetLastMovePlayerColor()
-		{
-			return History.Count % 2 == 0 ? Color.Black : Color.White;
-		}
+		public Color PrevTurnColor => History.Count % 2 == 0 ? Color.Black : Color.White;
+		public Color CurrentTurnColor => PrevTurnColor.Invert();
+
 
 		public HistoryEntry GetLastEntryForCell(string position)
 		{

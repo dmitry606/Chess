@@ -25,7 +25,7 @@ namespace Chess.MvcClient.Controllers
 			_logger = logger;
 		}
 
-		// GET api/values/5
+		// GET api/game/5v5ag567
 		[HttpGet("{id}")]
 		public async Task<IActionResult> Get(string id)
 		{
@@ -39,6 +39,44 @@ namespace Chess.MvcClient.Controllers
 			return new ObjectResult(game);
 		}
 
+		// GET api/game/5v5ag567/pos=e4
+		[HttpGet("{gameId}/pos={position}")]
+		public async Task<IActionResult> Get(string gameId, string position)
+		{
+			var game = await _repository.GetGameAsync(gameId);
+
+			if (null == game)
+			{
+				return HttpNotFound();
+			}
+
+			var moves = game.Board[game.Board.CurrentTurnColor].GetLegalMoves(position);
+			if (null == moves)
+				return HttpBadRequest();
+
+			return new ObjectResult(moves);
+		}
+
+		public class MakeMoveParams
+		{
+			public string fromPos { get; set; }
+			public string toPos { get; set; }
+		}
+
+		[HttpPut("{gameId}")]
+		public async void MakeMove(string gameId, [FromBody]MakeMoveParams parameters)
+		{
+			var game = await _repository.GetGameAsync(gameId);
+
+			if (null == game)
+			{
+				return;
+			}
+
+			game.Board[game.Board.CurrentTurnColor].MakeMove(parameters.fromPos, parameters.toPos);
+		}
+
+		//GET api/games/new
 		[HttpGet("new")]
 		public async Task<IActionResult> New()
 		{

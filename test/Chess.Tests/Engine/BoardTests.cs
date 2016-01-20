@@ -140,13 +140,13 @@ namespace Chess.Engine.Tests
 			var board = new Board();
 
 			board.PushHistory(new HistoryEntry("pe2", "e4", MoveType.Regular));
-			Assert.Equal(Color.White, board.GetLastMovePlayerColor());
+			Assert.Equal(Color.White, board.PrevTurnColor);
 
 			board.PushHistory(new HistoryEntry("Qd2", "b7", MoveType.Regular));
-			Assert.Equal(Color.Black, board.GetLastMovePlayerColor());
+			Assert.Equal(Color.Black, board.PrevTurnColor);
 
 			board.PushHistory(new HistoryEntry("Ke2", "d6", MoveType.Regular));
-			Assert.Equal(Color.White, board.GetLastMovePlayerColor());
+			Assert.Equal(Color.White, board.PrevTurnColor);
 		}
 
 		[Fact]
