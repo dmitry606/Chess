@@ -7,9 +7,8 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Chess.Repositories.Concrete;
-using Chess.Repositories;
 using Chess.MvcClient.Repositories.Concrete;
+using Chess.MvcClient.Repositories;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNet.Diagnostics;
 using Newtonsoft.Json.Serialization;
@@ -28,10 +27,6 @@ namespace MvcClient
 				.AddJsonFile("appsettings.json")
 				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
-			var console = new WindowsLogConsole();
-			console.WriteLine("Hello", null, null);
-
-
 			builder.AddEnvironmentVariables();
 			Configuration = builder.Build();
 		}
@@ -42,10 +37,9 @@ namespace MvcClient
 		// For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
         {
-			//services.AddTransient<IGameRepository>(s => new MongoGameRepository(
-			//	Configuration["Data:MongoDB:ConnectionString"],
-			//	Configuration["Data:MongoDB:DatabaseName"]));
-			services.AddSingleton<IGameRepository>(s => new InMemoryRepository());
+			services.AddRepositories();
+
+			services.AddScoped<IUserInfo>(s => new UserInfo());
 
 			services
 				.AddMvc()
@@ -70,17 +64,18 @@ namespace MvcClient
 				app.UseDeveloperExceptionPage();
 				app.UseRuntimeInfoPage(); // default path is /runtimeinfo
 			}
-
-			MongoMappingConfig.Configure();
+			
             app.UseIISPlatformHandler();
 			app.UseStaticFiles();
+			app.UseMiddleware<AuthCookiesMiddleware>();
+
 			app.UseMvc(routes =>
 			{
 				var endpoint = new { controller = "Home", action = "Index" };
 				routes.MapRoute("home", "", endpoint);
 				routes.MapRoute("game", "game/{id}", endpoint);
-				//routes.MapRoute("moves", "game/{id}/moves/{pos}", endpoint);
 			});
+
 			app.Run(async (context) =>
 			{
 				var logger = loggerFactory.CreateLogger("Catchall Endpoint");

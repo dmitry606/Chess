@@ -42,7 +42,7 @@ namespace Chess.Tests.Models
 			Assert.NotEqual(game1.GetHashCode(), game2.GetHashCode());
 
 			game2 = GameFactory.ConstructSomeBoard();
-			game2.BlackName = game2.BlackName + "diff";
+			game2.BlackId = game2.BlackId + "diff";
 			Assert.NotEqual(game1, game2);
 			Assert.NotEqual(game1.GetHashCode(), game2.GetHashCode());
 

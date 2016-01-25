@@ -1,4 +1,4 @@
-﻿using Chess.Repositories;
+﻿using Chess.MvcClient.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,28 +9,30 @@ using Chess.Engine;
 
 namespace Chess.MvcClient.Repositories.Concrete
 {
-	public class InMemoryRepository : IGameRepository
+	public class InMemoryGameRepository : IGameRepository
 	{
-		private static Dictionary<string, Game> _data = Enumerable.Range(606, 656)
+		private static Dictionary<string, Game> _games = Enumerable.Range(606, 656)
 			.Select(id => new Game
 			{
 				Id = id.ToString(),
 				Caption = $"Test game #{id}",
-				BlackName = "Black player",
-				WhiteName = "White player",
+				//BlackName = "Black player",
+				//WhiteName = "White player",
 				Board = Board.ConstructInitialBoard()
 			})
 			.ToDictionary(g => g.Id);
 
+
 		public async Task<List<Game>> GetAllGamesAsync()
 		{
-			return _data.Values.ToList();
+			return _games.Values.ToList();
 		}
+
 
 		public async Task<Game> GetGameAsync(string id)
 		{
 			Game game;
-			_data.TryGetValue(id, out game);
+			_games.TryGetValue(id, out game);
 			return game;
 		}
 
@@ -47,10 +49,24 @@ namespace Chess.MvcClient.Repositories.Concrete
 				isUpsert = true;
 			}
 
-			if(!isUpsert && !_data.ContainsKey(game.Id))
+			if(!isUpsert && !_games.ContainsKey(game.Id))
 				throw new ArgumentException($"Board with id '{game.Id}' not found");
 
-			_data[game.Id] = game;
+			_games[game.Id] = game;
+		}
+
+		public async Task<List<Game>> GetGamesByUserIdAsync(string userId)
+		{
+			return _games
+				.Where(kvp => userId.Equals(kvp.Value.BlackId) || userId.Equals(kvp.Value.WhiteId))
+				.Select(kvp => kvp.Value)
+				.ToList();
+		}
+
+
+		public void SetGameForTest(Game game)
+		{
+			_games[game.Id] = game;
 		}
 	}
 }

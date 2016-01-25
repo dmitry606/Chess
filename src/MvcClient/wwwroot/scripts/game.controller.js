@@ -10,6 +10,18 @@
 			$scope.columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 			$scope.board = {};
 
+			var parseQueryString = function (url) {
+				var urlParams = {};
+				url.replace(
+				  /([^?=&]+)(=([^&]*))?/g,
+				  function ($0, $1, $2, $3) {
+					urlParams[$1] = $3;
+				  }
+				);
+
+				return urlParams;
+			}			
+
 			/*
 			params
 			action: function (color, pieceChar, pos);
@@ -17,7 +29,7 @@
 			*/
 			function foreachPiece(action, color) {
 				var f = function (innerColor) {
-					ctrl.currentGame.Board[innerColor].PieceStrings.forEach(function (ps) {
+					ctrl.currentGame[innerColor].PieceStrings.forEach(function (ps) {
 						action(innerColor, ps[0], ps.substr(1, 2));
 					});
 				}
@@ -105,7 +117,7 @@
 					return '';
 
 				var find = function (color) {
-					var p = ctrl.currentGame.Board[color].PieceStrings.find(function (s) { return s.substr(1, 2) == pos; });
+					var p = ctrl.currentGame[color].PieceStrings.find(function (s) { return s.substr(1, 2) == pos; });
 					return p ? 'img/' + color + '/' + p[0] + '.png' : null;
 				}
 

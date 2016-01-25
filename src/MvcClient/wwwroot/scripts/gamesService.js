@@ -1,7 +1,8 @@
 'use strict';
 
 (function () {
-	
+	var apiBase = 	'/api/games/';
+
 	angular
 		.module('app')
 		.factory('gamesService', ['$http', function ($http) {
@@ -10,12 +11,10 @@
 			var _currentGame = null;
 
 			function newGame(onSuccess) {
-				$http.get('/api/game/new').success(function (game)
+				$http.get(apiBase + 'new').success(function (newId)
 				{
-					_currentGame = game;
-					onSuccess(getCurrent());
+					getGame(newId, onSuccess);
 				});
-				//onSuccess(JSON.parse(_initialBoard));
 			}
 
 			function getCurrent() {
@@ -24,8 +23,9 @@
 
 			function getGame(id, onSuccess) {
 				if (null == _currentGame || id !== _currentGame.Id) {
-					$http.get('/api/game/' + id).success(function (game) {
+					$http.get(apiBase + id).success(function (game) {
 						_currentGame = game;
+						_currentGame.Id = id;
 						onSuccess(getCurrent());
 					});
 					return;
@@ -35,11 +35,11 @@
 			}
 
 			function getMoves(gameId, pos, onSuccess) {
-				$http.get('/api/game/' + gameId + '/pos=' + pos).success(onSuccess);
+				$http.get(apiBase + gameId + '/pos=' + pos).success(onSuccess);
 			}
 
 			function makeMove(gameId, fromPos, toPos, onSuccess) {
-				$http.put('/api/game/' + gameId, { fromPos: fromPos, toPos: toPos }).success(function () {
+				$http.put(apiBase + gameId, { fromPos: fromPos, toPos: toPos }).success(function () {
 					_currentGame = null;
 					getGame(gameId, onSuccess);
 				});

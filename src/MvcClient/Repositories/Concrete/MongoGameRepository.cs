@@ -9,7 +9,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Diagnostics;
 
-namespace Chess.Repositories.Concrete
+namespace Chess.MvcClient.Repositories.Concrete
 {
 	public class MongoGameRepository : IGameRepository
 	{
@@ -61,6 +61,11 @@ namespace Chess.Repositories.Concrete
 				Debug.Fail("Document was not inserted with an intended id");
 				board.Id = ret.UpsertedId.ToString();
 			}
+		}
+
+		public async Task<List<Game>> GetGamesByUserIdAsync(string userId)
+		{
+			throw new NotImplementedException();
 		}
 
 

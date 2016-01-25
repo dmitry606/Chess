@@ -12,6 +12,7 @@ using Chess.Engine;
 using Chess.Tests;
 using Xunit;
 using Chess.MvcClient.Repositories.Concrete;
+using Chess.MvcClient.Repositories;
 
 namespace Chess.Repositories.Concrete.Tests
 {
@@ -126,6 +127,11 @@ namespace Chess.Repositories.Concrete.Tests
 			Assert.True(boards.SequenceEqual(actual));
 		}
 
+		[Fact]
+		public void GetGamesByUserIdAsync_test()
+		{
+			throw new NotImplementedException();
+		}
 
 		private bool Exists(string boardId)
 		{

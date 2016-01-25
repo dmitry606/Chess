@@ -16,7 +16,7 @@ namespace Chess.Engine
 		internal List<Piece> GetPieces() => 
 			PieceStrings.Select(s => PieceFactory.Create(Color, s)).ToList();
 
-		public void MakeMove(string from, string to, char? promotionTarget = null)
+		public virtual void MakeMove(string from, string to, char? promotionTarget = null)
 		{
 			if (string.IsNullOrEmpty(from))
 				throw new ArgumentException(nameof(from));

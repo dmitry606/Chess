@@ -14,8 +14,8 @@ namespace Chess.Tests
 			return new Game
 			{
 				Caption = "Initial test board",
-				WhiteName = "White player 1",
-				BlackName = "Black player 1",
+				WhiteId = "White player 1",
+				BlackId = "Black player 1",
 				Board = Engine.Board.ConstructInitialBoard(),
 			};
 		}
@@ -25,8 +25,8 @@ namespace Chess.Tests
 			return new Game
 			{
 				Caption = "Awesome game",
-				WhiteName = "White player 2",
-				BlackName = "Black player 2",
+				WhiteId = "White player 2",
+				BlackId = "Black player 2",
 				Board = BoardFactory.ConstructSomeBoard(),
 			};
 		}
@@ -36,8 +36,8 @@ namespace Chess.Tests
 			return new Game
 			{
 				Caption = "Not so awesome game",
-				WhiteName = "White player 3",
-				BlackName = "Black player 3",
+				WhiteId = "White player 3",
+				BlackId = "Black player 3",
 				Board = BoardFactory.ConstructAnotherBoard(),
 			};
 		}

@@ -38,6 +38,11 @@ namespace Chess.Engine
 			}
 		}
 
+		public virtual Color PrevTurnColor => History.Count % 2 == 0 ? Color.Black : Color.White;
+		public virtual Color CurrentTurnColor => PrevTurnColor.Invert();
+
+		public Player CurrentTurnPlayer => CurrentTurnColor == Color.White ? White : Black;
+
 		public bool IsOpen
 		{
 			get
@@ -47,8 +52,6 @@ namespace Chess.Engine
 			}
 		}
 
-		public Player this[Color playerColor] => playerColor == Color.White ? White : Black;
-
 		public Board()
 		{
 			White = new Player();
@@ -56,6 +59,7 @@ namespace Chess.Engine
 			History = new List<HistoryEntry>();
 		}
 
+		internal Player this[Color playerColor] => playerColor == Color.White ? White : Black;
 		internal CellHandle this[string position] => GetCellHandle(position, null);
 		internal CellHandle this[Piece piece] => GetCellHandle(piece.PieceString, piece.Color);
 
@@ -85,10 +89,6 @@ namespace Chess.Engine
 		{
 			return History.LastOrDefault();
 		}
-
-		public Color PrevTurnColor => History.Count % 2 == 0 ? Color.Black : Color.White;
-		public Color CurrentTurnColor => PrevTurnColor.Invert();
-
 
 		public HistoryEntry GetLastEntryForCell(string position)
 		{

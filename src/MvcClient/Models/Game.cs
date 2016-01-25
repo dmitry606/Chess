@@ -6,15 +6,14 @@ using Chess.Engine;
 
 namespace Chess.Models
 {
-	public class Game //: IEquatable<Game>
+	public class Game : IEquatable<Game>
 	{
 		public string Id { get; set; }
 		public string Caption { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime LastModifiedAt { get; set; }
-		public string WhiteName { get; set; }
-		public string BlackName { get; set; }
-
+		public string WhiteId { get; set; }
+		public string BlackId { get; set; }
 
 		public Board Board { get; set; }
 
@@ -31,8 +30,8 @@ namespace Chess.Models
 				Equals(Caption, other.Caption) &&
 				CreatedAt.ToString() == other.CreatedAt.ToString() &&
 				LastModifiedAt.ToString() == other.LastModifiedAt.ToString() &&
-				Equals(WhiteName, other.WhiteName) &&
-				Equals(BlackName, other.BlackName) &&
+				Equals(WhiteId, other.WhiteId) &&
+				Equals(BlackId, other.BlackId) &&
 
 				Equals(Board, other.Board);
 		}
@@ -50,8 +49,8 @@ namespace Chess.Models
 			hash = hash * 31 + CreatedAt.GetHashCode();
 			hash = hash * 31 + LastModifiedAt.GetHashCode();
 			hash = hash * 31 + Caption?.GetHashCode() ?? 0;
-			hash = hash * 31 + WhiteName?.GetHashCode() ?? 0;
-			hash = hash * 31 + BlackName?.GetHashCode() ?? 0;
+			hash = hash * 31 + WhiteId?.GetHashCode() ?? 0;
+			hash = hash * 31 + BlackId?.GetHashCode() ?? 0;
 			hash = hash * 31 + Board?.GetHashCode() ?? 0;
 
 			return hash;
