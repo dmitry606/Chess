@@ -80,22 +80,23 @@ namespace Chess.MvcClient.Controllers
 
 		//PUT api/games/55555/ +[BodyParams]
 		[HttpPut("{gameId}")]
-		public async void MakeMove(string gameId, [FromBody]MakeMoveParams moveParams)
+		public async Task<IActionResult> MakeMove(string gameId, [FromBody]MakeMoveParams moveParams)
 		{
 			var game = await _repository.GetGameAsync(gameId);
 
 			if (null == game)
 			{
-				return;
+				return HttpNotFound();
 			}
 
 			if (!CurrentUserHasColor(game, game.Board.CurrentTurnColor))
 			{
-				return;
+				return HttpUnauthorized();
 			}
 
 			game.Board.CurrentTurnPlayer.MakeMove(moveParams.fromPos, moveParams.toPos);
 			await _repository.SaveGameAsync(game);
+			return new NoContentResult();
 		}
 
 		public class MakeMoveParams

@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net451": {
+      "wrappedProject": "../../Engine/Chess.Engine.csproj",
+      "bin": {
+        "assembly": "../../Engine/obj/{configuration}/Chess.Engine.dll",
+        "pdb": "../../Engine/obj/{configuration}/Chess.Engine.pdb"
+      }
+    }
+  }
+}

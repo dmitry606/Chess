@@ -1,0 +1,17 @@
+﻿<table>
+	<tbody>
+		<tr ng-repeat="rowValue in rows">
+			<td ng-repeat="colValue in columns"
+				ng-init="pos=colValue + rowValue"
+				id="{{pos}}"
+				ng-click="onCellClick($event)"
+				ng-class="{'cell_selected': isActive(pos), 'cell_allowed_move': isAllowedMove(pos), 'cell_allowed_capture': isAllowedCapture(pos)}">
+
+				<img 
+					 ng-src="img/{{board[pos].color}}/{{board[pos].pieceChar}}.png" 
+					 ng-show="board[pos]"/>
+			</td>
+		</tr>
+	</tbody>
+</table>
+

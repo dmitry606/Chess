@@ -129,7 +129,7 @@ namespace Chess.Tests.Controllers
 		}
 
 		[Theory, MemberData(nameof(GetWrongPlayerData))]
-		public void MakeMove_dont_move_when_wrong_player(Game game, IUserInfo userInfo)
+		public async void MakeMove_dont_move_when_wrong_player(Game game, IUserInfo userInfo)
 		{
 			var playerMock = new Mock<Player>();
 			game.Board.White = playerMock.Object;
@@ -142,8 +142,9 @@ namespace Chess.Tests.Controllers
 			repoMock.Setup(r => r.GetGameAsync(game.Id)).Returns(() => Task.FromResult(game));
 
 			var ctrl = new GamesController(repoMock.Object, userInfo, NullLogger);
-			ctrl.MakeMove(game.Id, param);
+			var result = await ctrl.MakeMove(game.Id, param);
 
+			Assert.IsType<HttpUnauthorizedResult>(result);
 			playerMock.Verify(p => p.MakeMove(It.IsAny<string>(), It.IsAny<string>(), null), Times.Never);
 			repoMock.Verify(r => r.SaveGameAsync(It.IsAny<Game>()), Times.Never);
 		}

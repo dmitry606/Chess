@@ -2,142 +2,52 @@
 
 (function () {
 	angular.module('app').controller('GameController', [
-		'$scope', '$routeParams', 'gamesService',
-		function ($scope, $routeParams, gamesService) {
+		'$scope', '$routeParams', 'GamesService',
+		function ($scope, $routeParams, GamesService) {
 			var ctrl = this;
 			ctrl.currentGame = null;
-			$scope.rows = [8, 7, 6, 5, 4, 3, 2, 1];
-			$scope.columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 			$scope.board = {};
-
-			var parseQueryString = function (url) {
-				var urlParams = {};
-				url.replace(
-				  /([^?=&]+)(=([^&]*))?/g,
-				  function ($0, $1, $2, $3) {
-					urlParams[$1] = $3;
-				  }
-				);
-
-				return urlParams;
-			}			
-
-			/*
-			params
-			action: function (color, pieceChar, pos);
-			color: may be null
-			*/
-			function foreachPiece(action, color) {
-				var f = function (innerColor) {
-					ctrl.currentGame[innerColor].PieceStrings.forEach(function (ps) {
-						action(innerColor, ps[0], ps.substr(1, 2));
-					});
+			$scope.moves = { 
+				id: $routeParams['id'],
+				get: function (pos, onSuccess) {
+					GamesService.getMoves(ctrl.currentGame.Id, pos, onSuccess);
 				}
+			};
 
-				if (!color) {
-					f('Black');
-					f('White');
-				}
-				else {
-					f(color);
-				}
-			}
-
-
-
-			function switchHighlight(element) {
-				//remove currently highlighted allowed positions
-				$$('.cell_allowed_move').forEach(function (elem) {
-					elem.classList.remove('cell_allowed_move');
-				});
-
-				$$('.cell_allowed_capture').forEach(function (elem) {
-					elem.classList.remove('cell_allowed_capture');
-				});
-				
-				//remove currently selected element, if any
-				var selected = $('.cell_selected');
-				if (selected) {
-					selected.classList.remove('cell_selected');
-				}
-
-				//without element we just un-highlight all and return
-				if(!element)
-					return false;
-
-				//the second click on the highlighted cell. Un-highlight and return
-				if (selected && selected.id == element.id)
-					return false;
-
-				//cell without a piece on it
-				if (!$scope.board[element.id]) 
-					return false;
-
-				element.classList.add("cell_selected");
-				return true;
-			}
-
-			ctrl.onCellClick = function ($event) {
-				if ($event.currentTarget.classList.contains('cell_allowed_move') ||
-					$event.currentTarget.classList.contains('cell_allowed_capture')) {
-					var selected = $('.cell_selected');
-					gamesService.makeMove(ctrl.currentGame.Id, selected.id, $event.currentTarget.id, ctrl.setGame);
-					switchHighlight();
-					return;
-				}
-
-				if (switchHighlight($event.currentTarget)) {
-					gamesService.getMoves(ctrl.currentGame.Id, $event.currentTarget.id, function (moves) {
-						moves.forEach(function (m) {
-							$('#' + m.Destination).classList.add($scope.board[m.Destination] ?
-								'cell_allowed_capture' : 'cell_allowed_move');
-						});
-					});
-				}
-			}
-
-			ctrl.deletePiece = function ($event) {
-				$scope.board[$event.currentTarget.id] = {};
+			$scope.onMoved = function (from, to) {
+				GamesService.makeMove(ctrl.currentGame.Id, from, to, ctrl.setGame);
 			}
 
 			ctrl.setGame = function (game) {
-				$scope.board = {};
+				if (!game) return;
 				ctrl.currentGame = game;
-				ctrl.refresh();
+				ctrl.buildBoard();
 			}
 
-			ctrl.refresh = function () {
-				foreachPiece(function (color, pieceChar, pos) {
-					$scope.board[pos] = { color: color, pieceChar: pieceChar };
-				});
-			}
-
-			ctrl.getPieceSrc = function (pos) {
-				if(null == ctrl.currentGame)
-					return '';
-
-				var find = function (color) {
-					var p = ctrl.currentGame[color].PieceStrings.find(function (s) { return s.substr(1, 2) == pos; });
-					return p ? 'img/' + color + '/' + p[0] + '.png' : null;
+			ctrl.buildBoard = function () {
+				$scope.board = {};
+				var f = function (color) {
+					return function (pieceString) {
+						$scope.board[pieceString.substr(1, 2)] = { color: color, pieceChar: pieceString[0] };
+					}
 				}
 
-				return find('Black') || find('White') || '';
+				ctrl.currentGame.Black.PieceStrings.map(f('Black'));
+				ctrl.currentGame.White.PieceStrings.map(f('White'));
 			}
 
-			gamesService.getGame($routeParams['id'], function (newGame) {
+			GamesService.getGame($routeParams['id'], function (newGame) {
 				ctrl.setGame(newGame);
 			});
-
-
 		}]);
 
-	angular.module('app').directive("testDirective", function () {
-		return {
-			scope: {
-				name: '=player',
-			},
-			template: '<h3 ng-click=\'name = "changed in directive"\'>This is a {{name}} turn</h3>',
-		}
-	})
+	//angular.module('app').directive("testDirective", function () {
+	//	return {
+	//		scope: {
+	//			name: '=player',
+	//		},
+	//		template: '<h3 ng-click=\'name = "changed in directive"\'>This is a {{name}} turn</h3>',
+	//	}
+	//})
 
 })();

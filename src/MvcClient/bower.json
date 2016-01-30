@@ -1,11 +1,12 @@
 {
-	"name": "ASP.NET",
-	"private": true,
-	"dependencies": {
-		"angular": "1.4.8",
-		"angular-route": "1.4.8",
-		"bootstrap": "3.3.6",
-		"sprintf": "1.0.3"
-
-	}
+  "name": "ASP.NET",
+  "private": true,
+  "dependencies": {
+    "angular": "1.4.9",
+    "angular-route": "1.4.9",
+    "angular-mocks": "1.4.9",
+    "bootstrap": "3.3.6",
+    "sprintf": "1.0.3",
+    "jasmine": "2.4.1"
+  }
 }

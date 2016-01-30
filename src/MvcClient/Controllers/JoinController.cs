@@ -7,6 +7,7 @@ using Chess.MvcClient.Repositories;
 using Chess.MvcClient.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Chess.Engine;
+using Microsoft.AspNet.Mvc.ModelBinding;
 
 namespace Chess.MvcClient.Controllers
 {
@@ -22,23 +23,14 @@ namespace Chess.MvcClient.Controllers
 			_user = userInfo;
 		}
 
-		//[HttpGet("{gameId}")]
-		//public async Task<IActionResult> GetAvailability(string gameId)
-		//{
-		//	if (gameId == "none")
-		//		return HttpNotFound();
-
-		//	return new ObjectResult("value=" + gameId);
-		//}
-
-
-		//GET: api/join/5555
-		[HttpGet("{gameId}")]
-		public async Task<IActionResult> GetAvailability(string gameId)
+		//GET: api/join?info=5555
+		[HttpGet]
+		public async Task<IActionResult> GetAvailability(string info)
 		{
 			if (string.IsNullOrEmpty(_user.AuthString))
 				return HttpBadRequest();
 
+			var gameId = info;
 			if (string.IsNullOrEmpty(gameId))
 				return HttpNotFound();
 
@@ -63,16 +55,17 @@ namespace Chess.MvcClient.Controllers
 			return new ObjectResult(result);
 		}
 
-		// PUT: api/join/5555
+		// PUT: api/join/5555?color=1
 		[HttpPut("{gameId}")]
-        public async Task<IActionResult> Join(string gameId, [FromBody]Color color)
+        public async Task<IActionResult> Join(string gameId, [FromQuery]Color color)
         {
 			if (string.IsNullOrEmpty(_user.AuthString))
 				return HttpBadRequest();
-
+			if(!Enum.IsDefined(typeof(Color), color))
+				return HttpBadRequest();
 			if (string.IsNullOrEmpty(gameId))
 				return HttpNotFound();
-
+			
 			var game = await _repository.GetGameAsync(gameId);
 			if (game == null)
 				return HttpNotFound();

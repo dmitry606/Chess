@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess.Engine", "Engine\Ches
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{044D56BA-0D43-47DB-BF1B-79ECD3615D59}"
 	ProjectSection(SolutionItems) = preProject
-		.\global.json = .\global.json
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E8616EDE-B3E9-416B-93BD-F059E2AEB0C1}"
