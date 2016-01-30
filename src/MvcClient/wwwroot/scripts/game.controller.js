@@ -6,26 +6,25 @@
 		function ($scope, $routeParams, GamesService) {
 			var ctrl = this;
 			ctrl.currentGame = null;
-			$scope.board = {};
-			$scope.moves = { 
-				id: $routeParams['id'],
-				get: function (pos, onSuccess) {
-					GamesService.getMoves(ctrl.currentGame.Id, pos, onSuccess);
-				}
-			};
+			buildBoard();
 
-			$scope.onMoved = function (from, to) {
-				GamesService.makeMove(ctrl.currentGame.Id, from, to, ctrl.setGame);
+			function getMoves (pos, onSuccess) {
+				GamesService.getMoves($routeParams['id'], pos, onSuccess);
 			}
 
-			ctrl.setGame = function (game) {
-				if (!game) return;
-				ctrl.currentGame = game;
-				ctrl.buildBoard();
+			function getCurrentColor() {
+				return ctrl.currentGame.History.length % 2 == 0 ? 'White' : 'Black';
 			}
 
-			ctrl.buildBoard = function () {
-				$scope.board = {};
+			function buildBoard() {
+				$scope.board = {
+					getMoves: getMoves,
+					getCurrentColor: getCurrentColor
+				};
+
+				if (!ctrl.currentGame)
+					return;
+
 				var f = function (color) {
 					return function (pieceString) {
 						$scope.board[pieceString.substr(1, 2)] = { color: color, pieceChar: pieceString[0] };
@@ -34,6 +33,16 @@
 
 				ctrl.currentGame.Black.PieceStrings.map(f('Black'));
 				ctrl.currentGame.White.PieceStrings.map(f('White'));
+			}
+
+			$scope.onMoved = function (from, to) {
+				GamesService.makeMove($routeParams['id'], from, to, ctrl.setGame);
+			}
+
+			ctrl.setGame = function (game) {
+				if (!game) return;
+				ctrl.currentGame = game;
+				buildBoard();
 			}
 
 			GamesService.getGame($routeParams['id'], function (newGame) {

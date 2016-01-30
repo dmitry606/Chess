@@ -40,11 +40,15 @@
 					return;
 				}
 
-				if (sameCell || !$scope.board[pos])
+				if (sameCell || !$scope.canBeSelected(pos))
 					return;
 
 				$scope.active = pos;
-				$scope.movesFactory.get(pos, ctrl.setMoves);
+				$scope.board.getMoves(pos, ctrl.setMoves);
+			}
+
+			$scope.canBeSelected = function (pos) {
+				return $scope.board[pos] && $scope.board[pos].color == $scope.board.getCurrentColor();
 			}
 
 			$scope.isActive = function (pos) {
@@ -64,7 +68,6 @@
 			replace: true,
 			scope: {
 				board: '=ownerboard',
-				movesFactory: '=moves',
 				onMoved: '&onPieceMoved'
 			},
 
