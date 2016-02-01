@@ -276,19 +276,20 @@ namespace Chess.Engine
 					if (_atPromotion)
 						move.Secondary = SecondaryMoveType.Promotion;
                     result.Add(move);
+
+					if (_atInitial)
+					{
+						var doubleMove = Add(_start, dir * 2, 0);
+						if (null == boardMatrix[doubleMove])
+							result.Add(new MoveOption(
+								MoveType.Regular, BoardMatrix.ConvertCoords(doubleMove)));
+					}
 				}
 			}
 
 			Capture(Add(_start, dir * 1, 1), boardMatrix, result);
 			Capture(Add(_start, dir * 1, -1), boardMatrix, result);
 
-			if (_atInitial)
-			{
-				var doubleMove = Add(_start, dir * 2, 0);
-				if (null == boardMatrix[doubleMove])
-					result.Add(new MoveOption(
-						MoveType.Regular, BoardMatrix.ConvertCoords(doubleMove)));
-			}
 
 			return result;
 		}

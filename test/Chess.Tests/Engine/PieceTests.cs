@@ -541,6 +541,32 @@ namespace Chess.Tests.Models
 			Assert.Equal("g5", m.SpecialCapturePosition);
 		}
 
+		[Fact]
+		public void PawnTests_dont_jump_over_white()
+		{
+			var board = BoardMatrixFactory.GetEmptyBoard();
+			board["b2"] = Color.White;
+			board["b3"] = Color.White;
+			var piece = new Pawn(Color.White, "pb2");
+
+			var moves = piece.GetTechnicalMoves(board);
+
+			Assert.Equal(0, moves.Count);
+		}
+
+		[Fact]
+		public void PawnTests_dont_jump_over_black()
+		{
+			var board = BoardMatrixFactory.GetEmptyBoard();
+			board["b7"] = Color.Black;
+			board["b6"] = Color.Black;
+			var piece = new Pawn(Color.Black, "pb7");
+
+			var moves = piece.GetTechnicalMoves(board);
+
+			Assert.Equal(0, moves.Count);
+		}
+
 
 		private class TestPiece : Piece
 		{
