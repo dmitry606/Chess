@@ -8,6 +8,7 @@ using Chess.MvcClient.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Chess.Engine;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using Chess.Models;
 
 namespace Chess.MvcClient.Controllers
 {
@@ -23,14 +24,20 @@ namespace Chess.MvcClient.Controllers
 			_user = userInfo;
 		}
 
-		//GET: api/join?info=5555
-		[HttpGet]
-		public async Task<IActionResult> GetAvailability(string info)
+		public enum Availability
+		{
+			Closed = 0,
+			Open = 1,
+			Joined = 2
+		}
+
+		//GET api/join/5555
+		[HttpGet("{gameId}")]
+		public async Task<IActionResult> GetAvailability(string gameId)
 		{
 			if (string.IsNullOrEmpty(_user.AuthString))
 				return HttpBadRequest();
 
-			var gameId = info;
 			if (string.IsNullOrEmpty(gameId))
 				return HttpNotFound();
 
@@ -38,25 +45,11 @@ namespace Chess.MvcClient.Controllers
 			if (game == null)
 				return HttpNotFound();
 
-			int result = 0;
-
-			if (Equals(_user.AuthString, game.WhiteId))
-				result |= (int)Color.White;
-
-			if (Equals(_user.AuthString, game.BlackId))
-				result |= (int)Color.Black;
-
-			if (game.WhiteId == null)
-				result |= (int)Color.White;
-
-			if (game.BlackId == null)
-				result |= (int)Color.Black;
-
-			return new ObjectResult(result);
+			return new ObjectResult(GetAvailability(game));
 		}
 
-		// PUT: api/join/5555?color=1
-		[HttpPut("{gameId}")]
+		// PATCH api/join/5555?color=1
+		[HttpPatch("{gameId}")]
         public async Task<IActionResult> Join(string gameId, [FromQuery]Color color)
         {
 			if (string.IsNullOrEmpty(_user.AuthString))
@@ -70,26 +63,40 @@ namespace Chess.MvcClient.Controllers
 			if (game == null)
 				return HttpNotFound();
 
-			if (_user.AuthString.Equals(game.WhiteId) && color == Color.White)
-				return new ObjectResult((int)Color.White);
-			if (_user.AuthString.Equals(game.BlackId) && color == Color.Black)
-				return new ObjectResult((int)Color.Black);
-
 			if (game.WhiteId == null && color == Color.White)
 			{
 				game.WhiteId = _user.AuthString;
 				await _repository.SaveGameAsync(game);
-				return new ObjectResult((int)Color.White);
 			}
 
 			if (game.BlackId == null && color == Color.Black)
 			{
 				game.BlackId = _user.AuthString;
 				await _repository.SaveGameAsync(game);
-				return new ObjectResult((int)Color.Black);
 			}
 
-			return new ObjectResult(0);
+			return new ObjectResult(GetAvailability(game));
+		}
+
+		private int[] GetAvailability(Game game)
+		{
+			Availability white, black;
+
+			if (Equals(_user.AuthString, game.WhiteId))
+				white = Availability.Joined;
+			else if (game.WhiteId == null)
+				white = Availability.Open;
+			else
+				white = Availability.Closed;
+
+			if (Equals(_user.AuthString, game.BlackId))
+				black = Availability.Joined;
+			else if (game.BlackId == null)
+				black = Availability.Open;
+			else
+				black = Availability.Closed;
+
+			return new[] { (int)white, (int)black };
 		}
 	}
 }

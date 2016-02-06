@@ -1,14 +1,19 @@
-﻿'use strict';
+'use strict';
 
 (function () {
 	angular.module('app').directive('chessBoard', function () {
 
-		var link = function (scope, element, attrs) {
-			scope.rows = [8, 7, 6, 5, 4, 3, 2, 1];
-			scope.columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-		};
+		//var link = function ($scope, element, attrs) {
+		//};
 
-		var controller = function ($scope) {
+		var controller = function ($scope, BoardFactory, JoinFactory) {
+			$scope.joinCtrl = JoinFactory.getForCurrentRoute();
+			$scope.rows = [8, 7, 6, 5, 4, 3, 2, 1];
+			$scope.columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+			$scope.board = BoardFactory.getForCurrentRoute();
+			$scope.board.update();
+
 			var ctrl = this;
 			resetSelections();
 
@@ -31,12 +36,12 @@
 				var pos = $event.currentTarget.id;
 				var sameCell = $scope.isActive(pos);
 				var allowedMove = $scope.isAllowedMove(pos) || $scope.isAllowedCapture(pos);
-				var wasActive = $scope.active
+				var wasActive = $scope.active;
 
 				resetSelections();
 
 				if (allowedMove) {
-					$scope.onMoved({ from: wasActive, to: pos });
+					$scope.board.move(wasActive, pos);
 					return;
 				}
 
@@ -48,7 +53,9 @@
 			}
 
 			$scope.canBeSelected = function (pos) {
-				return $scope.board[pos] && $scope.board[pos].color == $scope.board.getCurrentColor();
+				return $scope.board[pos] &&
+					$scope.board[pos].color == $scope.board.getCurrentColor() &&
+					$scope.joinCtrl.isJoined($scope.board[pos].color);
 			}
 
 			$scope.isActive = function (pos) {
@@ -67,12 +74,9 @@
 		return {
 			replace: true,
 			scope: {
-				board: '=ownerboard',
-				onMoved: '&onPieceMoved'
 			},
 
 			templateUrl: 'partials/chess-board.html',
-			link: link,
 			controller: controller,
 			controllerAs: 'ctrl',
 		}

@@ -81,7 +81,9 @@ namespace MvcClient
 				var logger = loggerFactory.CreateLogger("Catchall Endpoint");
 				var message = $"No endpoint found for request '{context.Request.Path}'"; 
 				logger.LogInformation(message);
-				await context.Response.WriteAsync(message);
+
+				//await context.Response.WriteAsync(message);
+				context.Response.StatusCode = 404;
 			});
 		}
 

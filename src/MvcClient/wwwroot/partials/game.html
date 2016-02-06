@@ -1,2 +1,11 @@
 <h3>{{ctrl.currentGame.Caption}}</h3>
-<chess-board class='board' ownerboard='board'  on-piece-moved="onMoved(from, to)"/>
+<div class="row">
+	<div class="col-md-10 board-area">
+		<button class="btn btn-block btn-default" ng-click="joinCtrl.join('Black')" ng-show="joinCtrl.isOpen('Black')">Play Black</button>
+		<chess-board class='board' ownerboard='board' on-piece-moved="onMoved(from, to)"> </chess-board>
+		<button class="btn btn-block btn-default" ng-click="joinCtrl.join('White')" ng-show="joinCtrl.isOpen('White')">Play White</button>
+	</div>
+	<div class="col-md-2">
+		
+	</div>
+</div>

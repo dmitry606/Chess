@@ -24,11 +24,14 @@ namespace Chess.Engine
 				throw new ArgumentException(nameof(to));
 
 			var piece = FindPiece(from);
+			if(null == piece)
+				throw new ArgumentException($"No piece at {from}", nameof(from));
+
 			var move = piece
 				.GetTechnicalMoves(Board.GetMatrix())
 				.FirstOrDefault(m => m.Destination == to);
 			if (null == move)
-				throw new ArgumentException($"Move to {to} is not possible", nameof(to));
+				throw new ArgumentException($"Move {from}-{to} cannot be performed by the target piece", nameof(to));
 
 			new GameProcessor(Board).Execute(piece, move, promotionTarget);
 		}

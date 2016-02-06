@@ -20,7 +20,10 @@ module.exports = function(config) {
 		'wwwroot/lib/angular-mocks/angular-mocks.js',
 		'wwwroot/lib/jquery/dist/jquery.js',
 
-		'wwwroot/scripts/*.js',
+		'wwwroot/scripts/app.module.js',
+		'wwwroot/scripts/gamesService.js',
+		'wwwroot/scripts/Board.js',
+		
 		'js_test/*.js'
     ],
 

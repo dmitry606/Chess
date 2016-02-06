@@ -78,6 +78,7 @@ namespace Chess.MvcClient.Controllers
 			return new ObjectResult(moves);
 		}
 
+		//TODO: Use PATCH?
 		//PUT api/games/55555/ +[BodyParams]
 		[HttpPut("{gameId}")]
 		public async Task<IActionResult> MakeMove(string gameId, [FromBody]MakeMoveParams moveParams)

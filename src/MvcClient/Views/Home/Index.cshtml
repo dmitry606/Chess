@@ -13,7 +13,7 @@
 		</div>
 	</header>
 	<section>
-		<div class="container">
+		<div class="container container-main">
 			<div ng-view></div>
 		</div>
 	</section>
@@ -26,11 +26,17 @@
 	<script src="~/lib/sprintf/dist/sprintf.min.js"></script>
 	<script src="~/lib/sprintf/dist/angular-sprintf.min.js"></script>
 
+
+	<script src="~/scripts/ModelEvent.js"></script>
+
 	<script src="scripts/app.module.js"></script>
 	<script src="scripts/gamesService.js"></script>
+	<script src="scripts/Board.js"></script>
+	<script src="scripts/BoardFactory.js"></script>
+	<script src="scripts/JoinFactory.js"></script>
 	<script src="scripts/game.controller.js"></script>
 	<script src="scripts/start.controller.js"></script>
-	<script src="~/scripts/directives/chessBoard.js"></script>
+	<script src="scripts/directives/chessBoard.js"></script>
 	
 </body>
 </html>

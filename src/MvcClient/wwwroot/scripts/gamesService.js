@@ -5,13 +5,8 @@
 
 	angular
 		.module('app')
-		.factory('GamesService', ['$http', function ($http) {
+		.factory('GamesService', function ($http, $routeParams) {
 			var _currentGame = null;
-
-			//>>>> TEST
-			//$http.put('/api/join/606?color=1');
-			//$http.put('/api/join/606?color=2');
-			//<<<<<
 
 			function newGame(onSuccess) {
 				$http.get(apiBase + 'new').success(function (newId)
@@ -55,5 +50,5 @@
 				getMoves: getMoves,
 				makeMove: makeMove
 			}
-		}])
+		})
 })();

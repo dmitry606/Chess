@@ -133,6 +133,11 @@ namespace Chess.Repositories.Concrete.Tests
 			throw new NotImplementedException();
 		}
 
+		public void MultithreadingTest()
+		{
+			throw new NotImplementedException();
+		}
+
 		private bool Exists(string boardId)
 		{
 			if (string.IsNullOrEmpty(boardId))
